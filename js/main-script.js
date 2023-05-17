@@ -7,6 +7,8 @@ var geometry, mesh;
 
 var robot;
 
+var headPivot;
+
 var controls, stats;
 
 var animationFlags = new Map([
@@ -110,11 +112,11 @@ function createHead() {
     var box = new THREE.Box3().setFromObject(head);
     var point = new THREE.Vector3(0, box.min.y, 0);
 
-    var pivot = createPivot(head, point);
-    pivot.position.set(0, 30, -5)
-    //pivot.rotation.x += 0;
+    headPivot = createPivot(head, point);
+    headPivot.position.set(0, 30, -5)
+    //headPivot.rotation.x += 20;
   
-    robot.add(pivot);
+    robot.add(headPivot);
 }
 
 function createPivot(obj, vectorPoint) {
@@ -190,8 +192,10 @@ function init() {
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-
     render();
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -222,11 +226,13 @@ function onKeyDown(e) {
     switch (e.keyCode) {
         case 70: // F
         case 102: // f
-            animationFlags.set("F_head", true);
+            headPivot.rotation.x += Math.PI/16;
+            //animationFlags.set("F_head", !animationFlags.get("F_head"));
             break;
         case 82: // R
         case 114: // r
-            animationFlags.set("R_head", true);
+            headPivot.rotation.x -= Math.PI/16;
+            //animationFlags.set("R_head", !animationFlags.get("R_head"));
             break;
     }
 }
