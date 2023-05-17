@@ -9,6 +9,8 @@ var material = new THREE.MeshBasicMaterial({color: 0x000000});
 
 var robot;
 
+var controls;
+
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -120,6 +122,9 @@ function init() {
     createScene();
     createCamera();
 
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+
     render();
 }
 
@@ -128,8 +133,8 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
-
     render();
+    controls.update();
 
     requestAnimationFrame(animate);
 }
