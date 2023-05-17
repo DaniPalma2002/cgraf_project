@@ -5,12 +5,24 @@ var camera, scene, renderer;
 
 var geometry, mesh;
 
-var material = new THREE.MeshBasicMaterial({color: 0x000000});
-
 var robot;
 
 var controls, stats;
 
+var colors = new Map([
+    ["red", 0xFF0000],
+    ["green", 0x00FF00],
+    ["blue", 0x0000FF],
+    ["white", 0xFFFFFF],
+    ["black", 0x000000],
+    ["silver", 0xC0C0C0],
+    ["light red", 0xFFA07A],
+    ["dark red", 0x8B0000],
+    ["light green", 0x90EE90],
+    ["dark green", 0x006400],
+    ["light blue", 0xADD8E6],
+    ["dark blue", 0x00008B]
+]);
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -60,17 +72,17 @@ function createRobot() {
 function createChest() {
     'use strict'
     var chest = new THREE.Object3D();
-    addCube(chest, 100, 60, 80, 0, 0, 0, "0xff0000"); // torso
-    addCube(chest, 60, 20, 80, 0, -40, 0, "0xff0000"); // abdomen
-    addCube(chest, 60, 10, 80, 0, -55, 0, "0xff0000"); // waist
+    addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
+    addCube(chest, 60, 20, 80, 0, -40, 0, "dark red"); // abdomen
+    addCube(chest, 60, 10, 80, 0, -55, 0, "silver"); // waist
     robot.add(chest);
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
     'use strict';
     geometry = new THREE.BoxGeometry(Sx, Sy, Sz);
+    var material = new THREE.MeshBasicMaterial({ color:colors.get(color) });
     mesh = new THREE.Mesh(geometry, material);
-    mesh.material.color.setHex( color );
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
 }
