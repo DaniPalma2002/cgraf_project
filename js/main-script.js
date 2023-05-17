@@ -9,7 +9,7 @@ var material = new THREE.MeshBasicMaterial({color: 0x000000});
 
 var robot;
 
-var controls;
+var controls, stats;
 
 
 /////////////////////
@@ -119,6 +119,9 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    stats = new Stats()
+    document.body.appendChild(stats.dom)
+
     createScene();
     createCamera();
 
@@ -135,6 +138,7 @@ function animate() {
     'use strict';
     render();
     controls.update();
+    stats.update();
 
     requestAnimationFrame(animate);
 }
