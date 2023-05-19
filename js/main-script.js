@@ -1,7 +1,9 @@
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-var camera, scene, renderer;
+var camera,cameraFront, cameraSide, cameraTop, cameraOrtho, cameraPerspective;
+var scene, renderer;
+var activeCamera;
 
 var geometry, mesh;
 
@@ -58,14 +60,41 @@ function createScene(){
 //////////////////////
 function createCamera() {
     'use strict';
-    camera = new THREE.PerspectiveCamera(100,
-                                         window.innerWidth / window.innerHeight,
-                                         1,
-                                         1000);
-    camera.position.x = 0;
-    camera.position.y = 0;
-    camera.position.z = 200;
-    camera.lookAt(scene.position);
+    cameraFront = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
+    cameraFront.position.set(0, 0, 200);
+    cameraFront.lookAt(scene.position);
+
+    // Side camera
+    cameraSide = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
+    cameraSide.position.set(200, 0, 0);
+    cameraSide.lookAt(scene.position);
+
+    // Top camera
+    cameraTop = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
+    cameraTop.position.set(0, 200, 0);
+    cameraTop.lookAt(scene.position);
+
+    // Orthographic camera for isometric view
+    cameraOrtho = new THREE.OrthographicCamera(-200, 200, 200, -200, 1, 1000);
+    cameraOrtho.position.set(200, 200, 200);
+    cameraOrtho.lookAt(scene.position);
+
+    // Perspective camera for isometric view
+    cameraPerspective = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 1000);
+    cameraPerspective.position.set(200, 200, 200);
+    cameraPerspective.lookAt(scene.position);
+
+    activeCamera = cameraFront; // Set the initial active camera as front camera
+    scene.add(activeCamera);
+}
+
+function setActiveCamera(camera) {
+    scene.remove(activeCamera); // Remove the current active camera from the scene
+    activeCamera = camera; // Set the new active camera
+    scene.add(activeCamera); // Add the new active camera to the scene
 }
 
 /////////////////////
@@ -164,7 +193,7 @@ function update(){
 /////////////
 function render() {
     'use strict';
-    renderer.render(scene, camera);
+    renderer.render(scene, activeCamera);
 }
 
 ////////////////////////////////
@@ -184,7 +213,7 @@ function init() {
     createScene();
     createCamera();
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
@@ -262,6 +291,21 @@ function onKeyDown(e) {
         case 114: // r
             //headPivot.rotation.x -= Math.PI/16;
             animationFlags.set("R_head", !animationFlags.get("R_head"));
+            break;
+        case 49: // 1 key (front view)
+            setActiveCamera(cameraFront);
+            break;
+        case 50: // 2 key (side view)
+            setActiveCamera(cameraSide);
+            break;
+        case 51: // 3 key (top view)
+            setActiveCamera(cameraTop);
+            break;
+        case 52: // 4 key (isometric - orthogonal projection)
+            setActiveCamera(cameraOrtho);
+            break;
+        case 53: // 5 key (isometric - perspective projection)
+            setActiveCamera(cameraPerspective);
             break;
     }
 }
