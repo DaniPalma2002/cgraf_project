@@ -9,9 +9,9 @@ var geometry, mesh;
 
 var robot;
 
-var headPivot;
+var headPivot, rightMember, leftMember;
 
-var controls, stats;
+//var controls, stats;
 
 var animationFlags = new Map([
     ["Q_feet", false],
@@ -109,6 +109,7 @@ function createRobot() {
     robot = new THREE.Object3D();
     createChest();
     createHead();
+    createSuperiorMembers();
 
     scene.add(robot);
 }
@@ -128,10 +129,10 @@ function createHead() {
     'use strict'
     var head = new THREE.Object3D();
     addCube(head, 30, 30, 30, 0, 0, 0, "dark blue"); // head
-    addCube(head, 7.5, 5, 2.5, 7.5, 50-45, 10 + 2.5/2 +5, "silver"); // right eye
-    addCube(head, 7.5, 5, 2.5, -7.5, 50-45, 10 + 2.5/2 +5, "silver"); // left eye
-    addCube(head, 5, 20, 10, 17.5, 60-45, -5+5, "blue"); // right antenna
-    addCube(head, 5, 20, 10, -17.5, 60-45, -5+5, "blue"); // left antenna
+    addCube(head, 7.5, 5, 2.5, 7.5, 5, 16.25, "silver"); // right eye
+    addCube(head, 7.5, 5, 2.5, -7.5, 5, 16.25, "silver"); // left eye
+    addCube(head, 5, 20, 10, 17.5, 15, 0, "blue"); // right antenna
+    addCube(head, 5, 20, 10, -17.5, 15, 0, "blue"); // left antenna
 
     var box = new THREE.Box3().setFromObject(head);
     var point = new THREE.Vector3(0, box.min.y, 0);
@@ -141,6 +142,21 @@ function createHead() {
 
     robot.add(headPivot);
 }
+
+function createSuperiorMembers() {
+    'use strict';
+    rightMember = new THREE.Object3D();
+    leftMember = new THREE.Object3D();
+    addCube(leftMember, 20, 60, 20, 60, 0, -30, "dark red"); // left arm
+    addCube(rightMember, 20, 60, 20, -60, 0, -30, "dark red"); // right arm
+    addCube(leftMember, 20, 20, 80, 60, -40, 0, "dark red"); // left forearm
+    addCube(rightMember, 20, 20, 80, -60, -40, 0, "dark red"); // right forearm
+    addCilinder(leftMember, 5, 80, 75, 10, -32.5, 0, 0, "silver"); // left pipe
+    addCilinder(rightMember, 5, 80, -75, 10, -32.5, 0, 0, "silver"); // right pipe
+
+    robot.add(rightMember, leftMember);
+}
+
 
 function createPivot(obj, vectorPoint) {
 
@@ -153,12 +169,23 @@ function createPivot(obj, vectorPoint) {
     return pivot;
 }
 
-
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
     'use strict';
     geometry = new THREE.BoxGeometry(Sx, Sy, Sz);
     var material = new THREE.MeshBasicMaterial({ color:colors.get(color), wireframe:false });
     mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(Vx, Vy, Vz);
+    obj.add(mesh);
+}
+
+function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
+    'use strict';
+    geometry = new THREE.CylinderGeometry(r, r, h, 32);
+    var material = new THREE.MeshBasicMaterial({ color:colors.get(color), wireframe:false });
+    mesh = new THREE.Mesh(geometry, material);
+    if (rotation !== 0 && axis === 'z') {
+        mesh.rotateZ(rotation);
+    }
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
 }
@@ -207,18 +234,17 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    stats = new Stats()
-    document.body.appendChild(stats.dom)
+    //stats = new Stats()
+    //document.body.appendChild(stats.dom)
 
     createScene();
     createCamera();
 
-    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
+    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -239,8 +265,24 @@ function animate() {
                 case "S_legs":
                     break
                 case "E_arms":
+                    /* var direction = new THREE.Vector3(1, 0, 0);
+                    var speed = 1;
+                    var vector = direction.multiplyScalar(speed, speed, speed); */
+                    
+                    if (leftMember.position.x > -20 && rightMember.position.x < 20) {
+                        leftMember.position.x -= 1;
+                        rightMember.position.x += 1;
+                    } else {
+                        animationFlags.set(key, false);
+                    }
                     break
                 case "D_arms":
+                    if (leftMember.position.x < 0 && rightMember.position.x > 0) {
+                        leftMember.position.x += 1;
+                        rightMember.position.x -= 1;
+                    } else {
+                        animationFlags.set(key, false);
+                    }
                     break
                 case "R_head":
                     if (headPivot.rotation.x > -Math.PI)
@@ -262,8 +304,8 @@ function animate() {
 
     render();
 
-    controls.update();
-    stats.update();
+    //controls.update();
+    //stats.update();
 
     requestAnimationFrame(animate);
 }
@@ -273,7 +315,6 @@ function animate() {
 ////////////////////////////
 function onResize() {
     'use strict';
-
 }
 
 ///////////////////////
@@ -283,14 +324,16 @@ function onKeyDown(e) {
     'use strict';
     switch (e.keyCode) {
         case 70: // F
-        case 102: // f
-            //headPivot.rotation.x += Math.PI/16;
             animationFlags.set("F_head", !animationFlags.get("F_head"));
             break;
         case 82: // R
-        case 114: // r
-            //headPivot.rotation.x -= Math.PI/16;
             animationFlags.set("R_head", !animationFlags.get("R_head"));
+            break;
+        case 69: // E
+            animationFlags.set("E_arms", !animationFlags.get("E_arms"));
+            break ;
+        case 68: // D
+            animationFlags.set("D_arms", !animationFlags.get("D_arms"));
             break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
