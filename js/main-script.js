@@ -53,7 +53,7 @@ var colors = new Map([
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
-function createScene(){
+function createScene() {
     'use strict';
 
     scene = new THREE.Scene();
@@ -130,7 +130,8 @@ function createChest() {
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
     addCube(chest, 60, 20, 75, 0, -40, 0, "dark red"); // abdomen
     addCube(chest, 60, 10, 75, 0, -55, 0, "silver"); // waist
-    
+    //addCube(chest, 200, 1, 10000000, 0, -90, 0, "black");
+
     createHead();
     createSuperiorMembers();
     createLegs();
@@ -235,7 +236,7 @@ function addWheel(Px, Py, Pz) {
 function addConnector() {
     'use strict'
     let connector = new THREE.Object3D();
-    addCilinder(connector, 15, 20, 0, 0, 0, 0, "", "dark blue");
+    addCilinder(connector, 15, 17.5, 0, 1.25, 0, 0, "", "silver");
     trailer.add(connector);
     connector.position.x += 0;
     connector.position.y += -75;
@@ -313,7 +314,7 @@ function init() {
     createScene();
     createCamera();
 
-    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
+    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
@@ -402,8 +403,7 @@ function animate() {
          
     render();
 
-    //controls.update();
-    //stats.update();
+    controls.update();
 
     requestAnimationFrame(animate);
 }
