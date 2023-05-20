@@ -9,7 +9,7 @@ var geometry, mesh;
 
 var robot;
 
-var chest, head, rightMember, leftMember, inferiorMembers;
+var chest, head, rightMember, leftMember, legs, feet;
 
 var controls, stats;
 
@@ -117,12 +117,12 @@ function createChest() {
     'use strict'
     chest = new THREE.Object3D();
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
-    addCube(chest, 60, 20, 80, 0, -40, 0, "dark red"); // abdomen
-    addCube(chest, 60, 10, 80, 0, -55, 0, "silver"); // waist
+    addCube(chest, 60, 20, 75, 0, -40, 0, "dark red"); // abdomen
+    addCube(chest, 60, 10, 75, 0, -55, 0, "silver"); // waist
     
     createHead();
     createSuperiorMembers();
-    createInferiorMembers();
+    createLegs();
 
     //chest.position.set(100, 50, 40);
 
@@ -140,7 +140,7 @@ function createHead() {
     addCube(head, 5, 20, 10, 17.5, 30, 0, "blue"); // right antenna
     addCube(head, 5, 20, 10, -17.5, 30, 0, "blue"); // left antenna
 
-    head.position.set(0, 30, 5);
+    head.position.set(0, 29.99, 5);
 
     chest.add(head);
 }
@@ -149,8 +149,8 @@ function createSuperiorMembers() {
     'use strict';
     rightMember = new THREE.Object3D();
     leftMember = new THREE.Object3D();
-    addCube(leftMember, 20, 60, 20, 0, 0, -30, "dark red"); // left arm
-    addCube(rightMember, 20, 60, 20, 0, 0, -30, "dark red"); // right arm
+    addCube(leftMember, 19.99, 59.99, 19.99, 0, 0, -30, "dark red"); // left arm
+    addCube(rightMember, 19.99, 59.99, 19.99, 0, 0, -30, "dark red"); // right arm
     addCube(leftMember, 20, 20, 80, 0, -40, 0, "dark red"); // left forearm
     addCube(rightMember, 20, 20, 80, 0, -40, 0, "dark red"); // right forearm
     addCilinder(leftMember, 5, 80, 15, 10, -32.5, 0, 0, "silver"); // left pipe
@@ -162,39 +162,41 @@ function createSuperiorMembers() {
     chest.add(rightMember, leftMember);
 }
 
-function createInferiorMembers() {
+function createLegs() {
     'use strict';
     var geometry = new THREE.BoxGeometry(0, 0, 0);
     var material = new THREE.MeshBasicMaterial();
-    inferiorMembers = new THREE.Mesh(geometry, material);
-    createLegs(inferiorMembers);
-    createFeet(inferiorMembers);
-    inferiorMembers.position.y = -67.5
+    legs = new THREE.Mesh(geometry, material);
+    addCube(legs, 15, 45, 15, 15, -15, 0, "silver"); // left thigh
+    addCube(legs, 15, 45, 15, -15, -15, 0, "silver"); // right thigh
+    addCube(legs, 27.5, 90, 20, 16.25, -82.5, 0, "dark blue"); // left leg
+    addCube(legs, 27.5, 90, 20, -16.25, -82.5, 0, "dark blue"); // right leg
+    addCilinder(legs, 17.5, 15, 37.5, -5, 5, Math.PI / 2, 'z', "black"); // left wheel 1
+    addCilinder(legs, 17.5, 15, -37.5, -5, 5, Math.PI / 2, 'z', "black"); // right wheel 1
+    addCilinder(legs, 17.5, 15, 37.5, -60, 5, Math.PI / 2, 'z', "black"); // left wheel 2
+    addCilinder(legs, 17.5, 15, -37.5, -60, 5, Math.PI / 2, 'z', "black"); // right wheel 2
+    addCilinder(legs, 17.5, 15, 37.5, -105, 5, Math.PI / 2, 'z', "black"); // left wheel 3
+    addCilinder(legs, 17.5, 15, -37.5, -105, 5, Math.PI / 2, 'z', "black"); // right wheel 3 
+    
+    createFeet(legs);
+    legs.position.y = -67.5
     //inferiorMembers.rotateX(Math.PI/2)
     
-    chest.add(inferiorMembers);
+    chest.add(legs);
     
 }
 
-function createLegs(inferiorMembers) {
+function createFeet() {
     'use strict';
-    addCube(inferiorMembers, 15, 45, 15, 15, -15, 0, "silver"); // left thigh
-    addCube(inferiorMembers, 15, 45, 15, -15, -15, 0, "silver"); // right thigh
-    addCube(inferiorMembers, 27.5, 90, 20, 16.25, -82.5, 0, "dark blue"); // left leg
-    addCube(inferiorMembers, 27.5, 90, 20, -16.25, -82.5, 0, "dark blue"); // right leg
-    addCilinder(inferiorMembers, 17.5, 15, 37.5, -5, 5, Math.PI / 2, 'z', "black"); // left wheel 1
-    addCilinder(inferiorMembers, 17.5, 15, -37.5, -5, 5, Math.PI / 2, 'z', "black"); // right wheel 1
-    addCilinder(inferiorMembers, 17.5, 15, 37.5, -60, 5, Math.PI / 2, 'z', "black"); // left wheel 2
-    addCilinder(inferiorMembers, 17.5, 15, -37.5, -60, 5, Math.PI / 2, 'z', "black"); // right wheel 2
-    addCilinder(inferiorMembers, 17.5, 15, 37.5, -105, 5, Math.PI / 2, 'z', "black"); // left wheel 3
-    addCilinder(inferiorMembers, 17.5, 15, -37.5, -105, 5, Math.PI / 2, 'z', "black"); // right wheel 3 
-}
+    var geometry = new THREE.BoxGeometry(0);
+    var material = new THREE.MeshBasicMaterial();
+    feet = new THREE.Mesh(geometry, material);
+    addCube(feet, 27.5, 15, 35, 16.25, 0, 7.5, "blue"); // left foot
+    addCube(feet, 27.5, 15, 35, -16.25, 0, 7.5, "blue"); // right foot
 
-function createFeet(inferiorMembers) {
-    'use strict';
-    addCube(inferiorMembers, 32.5, 10, 30, 18.75, -132.25, 0, "blue"); // left foot
-    addCube(inferiorMembers, 32.5, 10, 30, -18.75, -132.25, 0, "blue"); // right foot
-
+    legs.add(feet);
+    feet.position.y = -135
+    //feet.rotateX(Math.PI/2)
     //robot.add(inferiorMembers);
 }
 
@@ -286,20 +288,25 @@ function animate() {
         if (value) {
             switch (key) {
                 case "Q_feet":
-                    break
+                    if (feet.rotation.x < Math.PI/2)
+                        feet.rotation.x += Math.PI/16;
+                    animationFlags.set(key, false);
+                    break;
                 case "A_feet":
-                    break
+                    if (feet.rotation.x > 0)
+                        feet.rotation.x -= Math.PI/16;
+                    animationFlags.set(key, false);
+                    break;
                 case "W_legs":
-                    console.log("ola");
-                    if (inferiorMembers.rotation.x < Math.PI/2)
-                        inferiorMembers.rotation.x += Math.PI/16;
+                    if (legs.rotation.x < Math.PI/2)
+                        legs.rotation.x += Math.PI/16;
                     animationFlags.set(key, false);
-                    break
+                    break;
                 case "S_legs":
-                    if (inferiorMembers.rotation.x > 0)
-                        inferiorMembers.rotation.x -= Math.PI/16;
+                    if (legs.rotation.x > 0)
+                        legs.rotation.x -= Math.PI/16;
                     animationFlags.set(key, false);
-                    break
+                    break;
                 case "E_arms":
                     /* var direction = new THREE.Vector3(1, 0, 0);
                     var speed = 1;
@@ -309,19 +316,19 @@ function animate() {
                         rightMember.position.x += 1;
                     }
                     animationFlags.set(key, false);
-                    break
+                    break;
                 case "D_arms":
                     if (leftMember.position.x - 60 < 0 && rightMember.position.x + 60 > 0) {
                         leftMember.position.x += 1;
                         rightMember.position.x -= 1;
                     }
                     animationFlags.set(key, false);
-                    break
+                    break;
                 case "R_head":
                     if (head.rotation.x > -Math.PI)
                         head.rotation.x -= Math.PI/16;
                     animationFlags.set(key, false);
-                    break
+                    break;
                 case "F_head":
                     if (head.rotation.x < 0)
                         head.rotation.x += Math.PI/16;
@@ -368,6 +375,12 @@ function onKeyDown(e) {
             break;
         case 83: // S
             animationFlags.set("S_legs", !animationFlags.get("S_legs"));
+            break;
+        case 81: // Q
+            animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
+            break;
+        case 65: // A
+            animationFlags.set("A_feet", !animationFlags.get("A_feet"));
             break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
