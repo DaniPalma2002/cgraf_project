@@ -108,8 +108,8 @@ function createRobot() {
     'use strict'
     robot = new THREE.Object3D();
     createChest();
-    createHead();
-    createSuperiorMembers();
+    //createHead();
+    //createSuperiorMembers();
 
     scene.add(robot);
 }
@@ -120,7 +120,10 @@ function createChest() {
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
     addCube(chest, 60, 20, 80, 0, -40, 0, "dark red"); // abdomen
     addCube(chest, 60, 10, 80, 0, -55, 0, "silver"); // waist
-    //chest.position.x = 100;
+    createHead();
+    createSuperiorMembers();
+    chest.position.set(100, 50, 40);
+
     robot.add(chest);
 }
 
@@ -135,9 +138,9 @@ function createHead() {
     addCube(head, 5, 20, 10, 17.5, 30, 0, "blue"); // right antenna
     addCube(head, 5, 20, 10, -17.5, 30, 0, "blue"); // left antenna
 
-    head.position.set(chest.position.x + 0, chest.position.y + 30, chest.position.z - 5);
+    head.position.set(0, 30, 5);
 
-    robot.add(head);
+    chest.add(head);
 }
 
 function createSuperiorMembers() {
@@ -151,11 +154,10 @@ function createSuperiorMembers() {
     addCilinder(leftMember, 5, 80, 15, 10, -32.5, 0, 0, "silver"); // left pipe
     addCilinder(rightMember, 5, 80, -15, 10, -32.5, 0, 0, "silver"); // right pipe
  
-    rightMember.position.set(chest.position.x - 60, chest.position.y, chest.position.z);
-    leftMember.position.set(chest.position.x + 60, chest.position.y, chest.position.z);
+    rightMember.position.set(-60, 0, 0);
+    leftMember.position.set(60, 0, 0);
     
-
-    robot.add(rightMember, leftMember);
+    chest.add(rightMember, leftMember);
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
@@ -257,16 +259,14 @@ function animate() {
                     /* var direction = new THREE.Vector3(1, 0, 0);
                     var speed = 1;
                     var vector = direction.multiplyScalar(speed, speed, speed); */
-                    if (leftMember.position.x - chest.position.x - 60 > -20 && 
-                        rightMember.position.x - chest.position.x + 60 < 20) {
+                    if (leftMember.position.x - 60 > -20 && rightMember.position.x + 60 < 20) {
                         leftMember.position.x -= 1;
                         rightMember.position.x += 1;
                     }
                     animationFlags.set(key, false);
                     break
                 case "D_arms":
-                    if (leftMember.position.x - chest.position.x - 60 < 0 && 
-                        rightMember.position.x - chest.position.x + 60 > 0) {
+                    if (leftMember.position.x - 60 < 0 && rightMember.position.x + 60 > 0) {
                         leftMember.position.x += 1;
                         rightMember.position.x -= 1;
                     }
