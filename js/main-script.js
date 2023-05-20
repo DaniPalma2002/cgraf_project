@@ -24,6 +24,8 @@ var animationFlags = new Map([
     ["F_head", false]
 ])
 
+var wireframeFlag = false;
+
 var colors = new Map([
     ["red", 0xFF0000],
     ["green", 0x00FF00],
@@ -48,7 +50,7 @@ function createScene(){
 
     scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0xF8F8FF);
+    scene.background = new THREE.Color(0xF8F8F8);
 
     scene.add(new THREE.AxesHelper(100));
 
@@ -124,7 +126,7 @@ function createChest() {
     createSuperiorMembers();
     createLegs();
 
-    //chest.position.set(100, 50, 40);
+    //chest.position.set(100, 100, 100);
 
     robot.add(chest);
 }
@@ -180,10 +182,8 @@ function createLegs() {
     
     createFeet(legs);
     legs.position.y = -67.5
-    //inferiorMembers.rotateX(Math.PI/2)
     
     chest.add(legs);
-    
 }
 
 function createFeet() {
@@ -191,13 +191,11 @@ function createFeet() {
     var geometry = new THREE.BoxGeometry(0);
     var material = new THREE.MeshBasicMaterial();
     feet = new THREE.Mesh(geometry, material);
-    addCube(feet, 27.5, 15, 35, 16.25, 0, 7.5, "blue"); // left foot
-    addCube(feet, 27.5, 15, 35, -16.25, 0, 7.5, "blue"); // right foot
+    addCube(feet, 27.49, 15, 35, 16.25, 0, 7.5, "blue"); // left foot
+    addCube(feet, 27.49, 15, 35, -16.25, 0, 7.5, "blue"); // right foot
 
     legs.add(feet);
     feet.position.y = -135
-    //feet.rotateX(Math.PI/2)
-    //robot.add(inferiorMembers);
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
@@ -308,9 +306,6 @@ function animate() {
                     animationFlags.set(key, false);
                     break;
                 case "E_arms":
-                    /* var direction = new THREE.Vector3(1, 0, 0);
-                    var speed = 1;
-                    var vector = direction.multiplyScalar(speed, speed, speed); */
                     if (leftMember.position.x - 60 > -20 && rightMember.position.x + 60 < 20) {
                         leftMember.position.x -= 1;
                         rightMember.position.x += 1;
@@ -337,6 +332,15 @@ function animate() {
             }
         }
     }
+
+    if (wireframeFlag) {
+        scene.traverse(function (node) {
+            if (node instanceof THREE.Mesh)
+                node.material.wireframe = !node.material.wireframe;
+        });
+        wireframeFlag = false;
+    }
+         
     render();
 
     controls.update();
@@ -397,6 +401,9 @@ function onKeyDown(e) {
         case 53: // 5 key (isometric - perspective projection)
             setActiveCamera(cameraPerspective);
             break;
+        case 54: // 6 key (wireframe)
+            wireframeFlag = !wireframeFlag;
+            break; 
     }
 }
 
