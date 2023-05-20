@@ -9,9 +9,9 @@ var geometry, mesh;
 
 var robot;
 
-var headPivot, rightMember, leftMember;
+var head, rightMember, leftMember;
 
-//var controls, stats;
+var controls, stats;
 
 var animationFlags = new Map([
     ["Q_feet", false],
@@ -127,20 +127,18 @@ function createChest() {
 
 function createHead() {
     'use strict'
-    var head = new THREE.Object3D();
-    addCube(head, 30, 30, 30, 0, 0, 0, "dark blue"); // head
-    addCube(head, 7.5, 5, 2.5, 7.5, 5, 16.25, "silver"); // right eye
-    addCube(head, 7.5, 5, 2.5, -7.5, 5, 16.25, "silver"); // left eye
-    addCube(head, 5, 20, 10, 17.5, 15, 0, "blue"); // right antenna
-    addCube(head, 5, 20, 10, -17.5, 15, 0, "blue"); // left antenna
+    var geometry = new THREE.BoxGeometry(0, 0, 0);
+    var material = new THREE.MeshBasicMaterial();
+    head = new THREE.Mesh(geometry, material);
+    addCube(head, 30, 30, 30, 0, 15, 0, "dark blue"); // head
+    addCube(head, 7.5, 5, 2.5, 7.5, 20, 16.25, "silver"); // right eye
+    addCube(head, 7.5, 5, 2.5, -7.5, 20, 16.25, "silver"); // left eye
+    addCube(head, 5, 20, 10, 17.5, 30, 0, "blue"); // right antenna
+    addCube(head, 5, 20, 10, -17.5, 30, 0, "blue"); // left antenna
 
-    var box = new THREE.Box3().setFromObject(head);
-    var point = new THREE.Vector3(0, box.min.y, 0);
+    head.position.set(0, 30, -5);
 
-    headPivot = createPivot(head, point);
-    headPivot.position.set(0, 30, -5)
-
-    robot.add(headPivot);
+    robot.add(head);
 }
 
 function createSuperiorMembers() {
@@ -155,18 +153,6 @@ function createSuperiorMembers() {
     addCilinder(rightMember, 5, 80, -75, 10, -32.5, 0, 0, "silver"); // right pipe
 
     robot.add(rightMember, leftMember);
-}
-
-
-function createPivot(obj, vectorPoint) {
-
-    obj.position.copy(vectorPoint);
-    obj.position.multiplyScalar(-1);
-
-    var pivot = new THREE.Group();
-    pivot.add(obj);
-
-    return pivot;
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
@@ -240,7 +226,7 @@ function init() {
     createScene();
     createCamera();
 
-    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
+    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
@@ -268,43 +254,35 @@ function animate() {
                     /* var direction = new THREE.Vector3(1, 0, 0);
                     var speed = 1;
                     var vector = direction.multiplyScalar(speed, speed, speed); */
-                    
                     if (leftMember.position.x > -20 && rightMember.position.x < 20) {
                         leftMember.position.x -= 1;
                         rightMember.position.x += 1;
-                    } else {
-                        animationFlags.set(key, false);
                     }
+                    animationFlags.set(key, false);
                     break
                 case "D_arms":
                     if (leftMember.position.x < 0 && rightMember.position.x > 0) {
                         leftMember.position.x += 1;
                         rightMember.position.x -= 1;
-                    } else {
-                        animationFlags.set(key, false);
                     }
+                    animationFlags.set(key, false);
                     break
                 case "R_head":
-                    if (headPivot.rotation.x > -Math.PI)
-                        headPivot.rotation.x -= Math.PI/16;
-                    else
-                        animationFlags.set(key, false);
+                    if (head.rotation.x > -Math.PI)
+                        head.rotation.x -= Math.PI/16;
+                    animationFlags.set(key, false);
                     break
                 case "F_head":
-                    if (headPivot.rotation.x < 0)
-                        headPivot.rotation.x += Math.PI/16;
-                    else
-                        animationFlags.set(key, false);
+                    if (head.rotation.x < 0)
+                        head.rotation.x += Math.PI/16;
+                    animationFlags.set(key, false);
                     break
             }
         }
     }
-
-
-
     render();
 
-    //controls.update();
+    controls.update();
     //stats.update();
 
     requestAnimationFrame(animate);
