@@ -8,11 +8,16 @@ var activeCamera;
 var geometry, mesh;
 
 var robot, trailer;
+var maxRobotVec, minRobotVec;
+var maxTrailerVec, minTrailerVec;
+var collision = false;
 
 var chest, head, rightMember, leftMember, legs, feet;
 var speed = 1;
 
 var controls, stats;
+
+var helper;
 
 var animationFlags = new Map([
     ["Q_feet", false],
@@ -120,7 +125,20 @@ function createRobot() {
     'use strict'
     robot = new THREE.Object3D();
     createChest();
-    
+    //robot.position.set(10, 30, 20);
+
+    maxRobotVec = new THREE.Vector3(60, 50, 40);
+    minRobotVec = new THREE.Vector3(-60, -90, -160);
+    minRobotVec.add(robot.position);
+    maxRobotVec.add(robot.position);
+
+    /* geometry = new THREE.BoxGeometry(maxRobotVec.x-minRobotVec.x, maxRobotVec.y-minRobotVec.y, maxRobotVec.z-minRobotVec.z);
+    var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set((maxRobotVec.x+minRobotVec.x)/2, (maxRobotVec.y+minRobotVec.y)/2, (maxRobotVec.z+minRobotVec.z)/2);
+    scene.add(mesh); */
+
+
     scene.add(robot);
 }
 
@@ -217,8 +235,21 @@ function createTrailer() {
     addWheel(45, -90, -60);
     addWheel(45, -90, -130);
     addConnector();
-    trailer.position.z -= 300;
+    trailer.position.z -=500;
     trailer.position.y += 25;
+
+    /* maxTrailerVec = new THREE.Vector3(55, 65, 155);
+    minTrailerVec = new THREE.Vector3(-55, -115, -155);
+    minTrailerVec.add(trailer.position);
+    maxTrailerVec.add(trailer.position); */
+
+    /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
+    var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
+    scene.add(mesh);  */
+
+
     scene.add(trailer);
 }
 
@@ -270,22 +301,16 @@ function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
 //////////////////////
 function checkCollisions() {
     'use strict';
-
-}
-
-function getMaxMinPoints(obj) {
-    'use strict';
-    var vectorMax = new THREE.Vector3(-Infinity, -Infinity, -Infinity) ;
-    var vectorMin = new THREE.Vector3(Infinity, Infinity, Infinity) ;
-    obj.traverse(function (node) {
-        if (node instanceof THREE.Mesh || node instanceof THREE.Object3D) {
-            var nodePos = new THREE.Vector3();
-            node.getWorldPosition(nodePos);
-            vectorMax.max(nodePos);
-            vectorMin.min(nodePos);
-        }
-    });
-    return {vectorMax, vectorMin}
+    if (minRobotVec.z < maxTrailerVec.z && 
+        maxRobotVec.z > minTrailerVec.z &&
+        maxRobotVec.x > minTrailerVec.x && 
+        minRobotVec.x < maxTrailerVec.x && 
+        maxRobotVec.y > minTrailerVec.y && 
+        minRobotVec.y < maxTrailerVec.y) {
+        console.log("collision");
+        collision = true;
+        handleCollisions();
+    }
 }
 
 ///////////////////////
@@ -293,8 +318,7 @@ function getMaxMinPoints(obj) {
 ///////////////////////
 function handleCollisions() {
     'use strict';
-    vector = THREE.Vector3(robot.position.x, robot.position.y, robot.position.z + 200);
-    trailer.position.set(vector);
+    trailer.position.set(robot.position.x, robot.position.y + trailer.position.y, robot.position.z - 210);
 
 }
 
@@ -348,18 +372,31 @@ function animate() {
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
     for (let [key, value] of trailerFlags) {
         if (value) {
+            //scene.remove(helper);
+            if (collision) break;
+            maxTrailerVec = new THREE.Vector3(55, 65, 155);
+            minTrailerVec = new THREE.Vector3(-55, -115, -155);
+            minTrailerVec.add(trailer.position);
+            maxTrailerVec.add(trailer.position);
+            checkCollisions();
+            /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
+            var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
+            helper = new THREE.Mesh(geometry, material);
+            helper.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
+            scene.add(helper); */ 
+            
             switch (key) {
                 case "UP":
-                    newTrailerVector.z += 0.5;
+                    newTrailerVector.z += 2;
                     break;
                 case "LEFT":
-                    newTrailerVector.x -= 0.5;
+                    newTrailerVector.x -= 2;
                     break;
                 case "DOWN":
-                    newTrailerVector.z -= 0.5;
+                    newTrailerVector.z -= 2;
                     break;
                 case "RIGHT":
-                    newTrailerVector.x += 0.5;
+                    newTrailerVector.x += 2;
                     break;
             }
         }
@@ -367,7 +404,13 @@ function animate() {
     trailer.position.add(newTrailerVector);
     for (let [key, value] of animationFlags) {
         if (value) {
-            console.log(getMaxMinPoints(robot));
+            
+            /* scene.remove(helper);
+            helper = new THREE.BoxHelper(robot, 0x000000);
+            helper.update();
+            scene.add(helper); */
+            // print helper box dimensions
+
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
