@@ -378,7 +378,11 @@ function animate() {
             minTrailerVec = new THREE.Vector3(-55, -115, -155);
             minTrailerVec.add(trailer.position);
             maxTrailerVec.add(trailer.position);
-            checkCollisions();
+            if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 && 
+                head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
+                leftMember.position.x - 60 <= -20) {
+                checkCollisions();
+            }
             /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
             var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
             helper = new THREE.Mesh(geometry, material);
