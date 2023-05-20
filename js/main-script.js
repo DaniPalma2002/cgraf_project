@@ -217,6 +217,7 @@ function createTrailer() {
     addWheel(45, -90, -130);
     addConnector();
     trailer.position.z -= 300;
+    trailer.position.y += 25;
     scene.add(trailer);
 }
 
