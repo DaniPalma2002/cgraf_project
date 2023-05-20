@@ -9,7 +9,7 @@ var geometry, mesh;
 
 var robot;
 
-var chest, head, rightMember, leftMember;
+var chest, head, rightMember, leftMember, inferiorMembers;
 
 var controls, stats;
 
@@ -168,36 +168,36 @@ function createInferiorMembers() {
     'use strict';
     var geometry = new THREE.BoxGeometry(0, 0, 0);
     var material = new THREE.MeshBasicMaterial();
-    var inferiorMembers = new THREE.Mesh(geometry, material);
+    inferiorMembers = new THREE.Mesh(geometry, material);
     createLegs(inferiorMembers);
     createFeet(inferiorMembers);
-
+    inferiorMembers.position.y = -67.5
+    //inferiorMembers.rotateX(Math.PI/2)
+    
     chest.add(inferiorMembers);
     
 }
 
 function createLegs(inferiorMembers) {
     'use strict';
-    addCube(inferiorMembers, 15, 50, 15, 15, -85, 0, "silver"); // left thigh
-    addCube(inferiorMembers, 15, 50, 15, -15, -85, 0, "silver"); // right thigh
-    addCube(inferiorMembers, 27.5, 70, 20, 15 + 2.5/2, -145, 0, "dark blue"); // left leg
-    addCube(inferiorMembers, 27.5, 70, 20, -15 - 2.5/2, -145, 0, "dark blue"); // right leg
-    addCilinder(inferiorMembers, 15, 10, 35, -65, 0, Math.PI / 2, 'z', "black"); // left wheel 1
-    addCilinder(inferiorMembers, 15, 10, 35, -125, 0, Math.PI / 2, 'z', "black"); // left wheel 2
-    addCilinder(inferiorMembers, 15, 10, 35, -160, 0, Math.PI / 2, 'z', "black"); // left wheel 3
-    addCilinder(inferiorMembers, 15, 10, -35, -65, 0, Math.PI / 2, 'z', "black"); // right wheel 1
-    addCilinder(inferiorMembers, 15, 10, -35, -125, 0, Math.PI / 2, 'z', "black"); // right wheel 2
-    addCilinder(inferiorMembers, 15, 10, -35, -160, 0, Math.PI / 2, 'z', "black"); // right wheel 3
-
-    robot.add(inferiorMembers);
+    addCube(inferiorMembers, 15, 50, 15, 15, -17.5, 0, "silver"); // left thigh
+    addCube(inferiorMembers, 15, 50, 15, -15, -17.5, 0, "silver"); // right thigh
+    addCube(inferiorMembers, 27.5, 70, 20, 16.25, -77.5, 0, "dark blue"); // left leg
+    addCube(inferiorMembers, 27.5, 70, 20, -16.25, -77.5, 0, "dark blue"); // right leg
+    addCilinder(inferiorMembers, 15, 10, 35, 2.5, 0, Math.PI / 2, 'z', "black"); // left wheel 1
+    addCilinder(inferiorMembers, 15, 10, 35, -57.5, 0, Math.PI / 2, 'z', "black"); // left wheel 2
+    addCilinder(inferiorMembers, 15, 10, 35, -92.5, 0, Math.PI / 2, 'z', "black"); // left wheel 3
+    addCilinder(inferiorMembers, 15, 10, -35, 2.5, 0, Math.PI / 2, 'z', "black"); // right wheel 1
+    addCilinder(inferiorMembers, 15, 10, -35, -57.5, 0, Math.PI / 2, 'z', "black"); // right wheel 2
+    addCilinder(inferiorMembers, 15, 10, -35, -92.5, 0, Math.PI / 2, 'z', "black"); // right wheel 3 
 }
 
 function createFeet(inferiorMembers) {
     'use strict';
-    addCube(inferiorMembers, 32.5, 10, 30, 37.5/2, -185, 0, "blue"); // left foot
-    addCube(inferiorMembers, 32.5, 10, 30, -37.5/2, -185, 0, "blue"); // right foot
+    addCube(inferiorMembers, 32.5, 10, 30, 37.5/2, -185+67.5, 0, "blue"); // left foot
+    addCube(inferiorMembers, 32.5, 10, 30, -37.5/2, -185+67.5, 0, "blue"); // right foot
 
-    robot.add(inferiorMembers);
+    //robot.add(inferiorMembers);
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
@@ -292,8 +292,15 @@ function animate() {
                 case "A_feet":
                     break
                 case "W_legs":
+                    console.log("ola");
+                    if (inferiorMembers.rotation.x < Math.PI/2)
+                        inferiorMembers.rotation.x += Math.PI/16;
+                    animationFlags.set(key, false);
                     break
                 case "S_legs":
+                    if (inferiorMembers.rotation.x > 0)
+                        inferiorMembers.rotation.x -= Math.PI/16;
+                    animationFlags.set(key, false);
                     break
                 case "E_arms":
                     /* var direction = new THREE.Vector3(1, 0, 0);
@@ -358,6 +365,12 @@ function onKeyDown(e) {
         case 68: // D
             animationFlags.set("D_arms", !animationFlags.get("D_arms"));
             break;
+        case 87: // W
+            animationFlags.set("W_legs", !animationFlags.get("W_legs"));
+            break;
+        case 83: // S
+            animationFlags.set("S_legs", !animationFlags.get("S_legs"));
+            break
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
             break;
