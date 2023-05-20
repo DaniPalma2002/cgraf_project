@@ -9,7 +9,7 @@ var geometry, mesh;
 
 var robot;
 
-var head, rightMember, leftMember;
+var chest, head, rightMember, leftMember;
 
 var controls, stats;
 
@@ -116,13 +116,12 @@ function createRobot() {
 
 function createChest() {
     'use strict'
-    var chest = new THREE.Object3D();
+    chest = new THREE.Object3D();
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
     addCube(chest, 60, 20, 80, 0, -40, 0, "dark red"); // abdomen
     addCube(chest, 60, 10, 80, 0, -55, 0, "silver"); // waist
-
+    //chest.position.x = 100;
     robot.add(chest);
-
 }
 
 function createHead() {
@@ -136,7 +135,7 @@ function createHead() {
     addCube(head, 5, 20, 10, 17.5, 30, 0, "blue"); // right antenna
     addCube(head, 5, 20, 10, -17.5, 30, 0, "blue"); // left antenna
 
-    head.position.set(0, 30, -5);
+    head.position.set(chest.position.x + 0, chest.position.y + 30, chest.position.z - 5);
 
     robot.add(head);
 }
@@ -145,12 +144,16 @@ function createSuperiorMembers() {
     'use strict';
     rightMember = new THREE.Object3D();
     leftMember = new THREE.Object3D();
-    addCube(leftMember, 20, 60, 20, 60, 0, -30, "dark red"); // left arm
-    addCube(rightMember, 20, 60, 20, -60, 0, -30, "dark red"); // right arm
-    addCube(leftMember, 20, 20, 80, 60, -40, 0, "dark red"); // left forearm
-    addCube(rightMember, 20, 20, 80, -60, -40, 0, "dark red"); // right forearm
-    addCilinder(leftMember, 5, 80, 75, 10, -32.5, 0, 0, "silver"); // left pipe
-    addCilinder(rightMember, 5, 80, -75, 10, -32.5, 0, 0, "silver"); // right pipe
+    addCube(leftMember, 20, 60, 20, 0, 0, -30, "dark red"); // left arm
+    addCube(rightMember, 20, 60, 20, 0, 0, -30, "dark red"); // right arm
+    addCube(leftMember, 20, 20, 80, 0, -40, 0, "dark red"); // left forearm
+    addCube(rightMember, 20, 20, 80, 0, -40, 0, "dark red"); // right forearm
+    addCilinder(leftMember, 5, 80, 15, 10, -32.5, 0, 0, "silver"); // left pipe
+    addCilinder(rightMember, 5, 80, -15, 10, -32.5, 0, 0, "silver"); // right pipe
+ 
+    rightMember.position.set(chest.position.x - 60, chest.position.y, chest.position.z);
+    leftMember.position.set(chest.position.x + 60, chest.position.y, chest.position.z);
+    
 
     robot.add(rightMember, leftMember);
 }
@@ -238,7 +241,7 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
-
+    // TODO use of vectors and speed, not so hardcoded
     for (let [key, value] of animationFlags) {
         if (value) {
             switch (key) {
@@ -254,14 +257,16 @@ function animate() {
                     /* var direction = new THREE.Vector3(1, 0, 0);
                     var speed = 1;
                     var vector = direction.multiplyScalar(speed, speed, speed); */
-                    if (leftMember.position.x > -20 && rightMember.position.x < 20) {
+                    if (leftMember.position.x - chest.position.x - 60 > -20 && 
+                        rightMember.position.x - chest.position.x + 60 < 20) {
                         leftMember.position.x -= 1;
                         rightMember.position.x += 1;
                     }
                     animationFlags.set(key, false);
                     break
                 case "D_arms":
-                    if (leftMember.position.x < 0 && rightMember.position.x > 0) {
+                    if (leftMember.position.x - chest.position.x - 60 < 0 && 
+                        rightMember.position.x - chest.position.x + 60 > 0) {
                         leftMember.position.x += 1;
                         rightMember.position.x -= 1;
                     }
