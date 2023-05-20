@@ -7,7 +7,7 @@ var activeCamera;
 
 var geometry, mesh;
 
-var robot;
+var robot, trailer;
 
 var chest, head, rightMember, leftMember, legs, feet;
 
@@ -22,6 +22,13 @@ var animationFlags = new Map([
     ["D_arms", false],
     ["R_head", false],
     ["F_head", false]
+])
+
+var trailerFlags = new Map([
+    ["UP", false],
+    ["LEFT", false],
+    ["DOWN", false],
+    ["RIGHT", false]
 ])
 
 var wireframeFlag = false;
@@ -55,7 +62,7 @@ function createScene(){
     scene.add(new THREE.AxesHelper(100));
 
     createRobot();
-
+    createTrailer();
 }
 
 //////////////////////
@@ -198,6 +205,40 @@ function createFeet() {
     feet.position.y = -135
 }
 
+function createTrailer() {
+    'use strict'
+    trailer = new THREE.Object3D();
+    addCube(trailer, 110, 130, 310, 0, 0, 0, "dark blue");
+    addWheel(-45, -90, -60);
+    addWheel(-45, -90, -130);
+    addWheel(45, -90, -60);
+    addWheel(45, -90, -130);
+    addConnector();
+    trailer.position.z -= 300;
+    scene.add(trailer);
+}
+
+function addWheel(Px, Py, Pz) {
+    'use strict'
+    let wheel = new THREE.Object3D();
+    addCilinder(wheel, 25, 20, 0, 0, 0, Math.PI / 2, "z", "black");
+    addCilinder(wheel, 15, 21, 0, 0, 0, Math.PI / 2, "z", "silver");
+    trailer.add(wheel);
+    wheel.position.x += Px;
+    wheel.position.y += Py;
+    wheel.position.z += Pz;
+}
+
+function addConnector() {
+    'use strict'
+    let connector = new THREE.Object3D();
+    addCilinder(connector, 15, 20, 0, 0, 0, "dark blue");
+    trailer.add(connector);
+    connector.position.x += 0;
+    connector.position.y += -75;
+    connector.position.z += 110;
+}
+
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
     'use strict';
     geometry = new THREE.BoxGeometry(Sx, Sy, Sz);
@@ -274,6 +315,7 @@ function init() {
     render();
 
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
 }
 
 /////////////////////
@@ -282,6 +324,26 @@ function init() {
 function animate() {
     'use strict';
     // TODO use of vectors and speed, not so hardcoded
+    let newTrailerVector = new THREE.Vector3(0, 0, 0);
+    for (let [key, value] of trailerFlags) {
+        if (value) {
+            switch (key) {
+                case "UP":
+                    newTrailerVector.z += 0.5;
+                    break;
+                case "LEFT":
+                    newTrailerVector.x -= 0.5;
+                    break;
+                case "DOWN":
+                    newTrailerVector.z -= 0.5;
+                    break;
+                case "RIGHT":
+                    newTrailerVector.x += 0.5;
+                    break;
+            }
+        }
+    }
+    trailer.position.add(newTrailerVector);
     for (let [key, value] of animationFlags) {
         if (value) {
             switch (key) {
@@ -362,6 +424,18 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
     switch (e.keyCode) {
+        case 37: // Arrow Left
+            trailerFlags.set("LEFT", true);
+            break;
+        case 38: // Arrow Up
+            trailerFlags.set("UP", true);
+            break;
+        case 39: // Arrow Right
+            trailerFlags.set("RIGHT", true);
+            break;
+        case 40: // Arrow Down
+            trailerFlags.set("DOWN", true);
+            break;
         case 70: // F
             animationFlags.set("F_head", !animationFlags.get("F_head"));
             break;
@@ -412,5 +486,18 @@ function onKeyDown(e) {
 ///////////////////////
 function onKeyUp(e){
     'use strict';
-
+    switch (e.keyCode) {
+        case 37: // Arrow Left
+            trailerFlags.set("LEFT", false);
+            break;
+        case 38: // Arrow Up
+            trailerFlags.set("UP", false);
+            break;
+        case 39: // Arrow Right
+            trailerFlags.set("RIGHT", false);
+            break;
+        case 40: // Arrow Down
+            trailerFlags.set("DOWN", false);
+            break;
+    }
 }

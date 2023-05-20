@@ -68,7 +68,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.enableKeys = true;
 
 	// The four arrow keys
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+	this.keys = { LEFT: 65, UP: 87, RIGHT: 68, BOTTOM: 83 };
 
 	// Mouse buttons
 	this.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
