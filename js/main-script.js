@@ -234,7 +234,7 @@ function addWheel(Px, Py, Pz) {
 function addConnector() {
     'use strict'
     let connector = new THREE.Object3D();
-    addCilinder(connector, 15, 20, 0, 0, 0, "dark blue");
+    addCilinder(connector, 15, 20, 0, 0, 0, 0, "", "dark blue");
     trailer.add(connector);
     connector.position.x += 0;
     connector.position.y += -75;
