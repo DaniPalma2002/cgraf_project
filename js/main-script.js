@@ -109,8 +109,6 @@ function createRobot() {
     'use strict'
     robot = new THREE.Object3D();
     createChest();
-    //createHead();
-    //createSuperiorMembers();
 
     scene.add(robot);
 }
@@ -126,7 +124,7 @@ function createChest() {
     createSuperiorMembers();
     createInferiorMembers();
 
-    chest.position.set(100, 50, 40);
+    //chest.position.set(100, 50, 40);
 
     robot.add(chest);
 }
@@ -180,22 +178,22 @@ function createInferiorMembers() {
 
 function createLegs(inferiorMembers) {
     'use strict';
-    addCube(inferiorMembers, 15, 50, 15, 15, -17.5, 0, "silver"); // left thigh
-    addCube(inferiorMembers, 15, 50, 15, -15, -17.5, 0, "silver"); // right thigh
-    addCube(inferiorMembers, 27.5, 70, 20, 16.25, -77.5, 0, "dark blue"); // left leg
-    addCube(inferiorMembers, 27.5, 70, 20, -16.25, -77.5, 0, "dark blue"); // right leg
-    addCilinder(inferiorMembers, 15, 10, 35, 2.5, 0, Math.PI / 2, 'z', "black"); // left wheel 1
-    addCilinder(inferiorMembers, 15, 10, 35, -57.5, 0, Math.PI / 2, 'z', "black"); // left wheel 2
-    addCilinder(inferiorMembers, 15, 10, 35, -92.5, 0, Math.PI / 2, 'z', "black"); // left wheel 3
-    addCilinder(inferiorMembers, 15, 10, -35, 2.5, 0, Math.PI / 2, 'z', "black"); // right wheel 1
-    addCilinder(inferiorMembers, 15, 10, -35, -57.5, 0, Math.PI / 2, 'z', "black"); // right wheel 2
-    addCilinder(inferiorMembers, 15, 10, -35, -92.5, 0, Math.PI / 2, 'z', "black"); // right wheel 3 
+    addCube(inferiorMembers, 15, 45, 15, 15, -15, 0, "silver"); // left thigh
+    addCube(inferiorMembers, 15, 45, 15, -15, -15, 0, "silver"); // right thigh
+    addCube(inferiorMembers, 27.5, 90, 20, 16.25, -82.5, 0, "dark blue"); // left leg
+    addCube(inferiorMembers, 27.5, 90, 20, -16.25, -82.5, 0, "dark blue"); // right leg
+    addCilinder(inferiorMembers, 17.5, 15, 37.5, -5, 5, Math.PI / 2, 'z', "black"); // left wheel 1
+    addCilinder(inferiorMembers, 17.5, 15, -37.5, -5, 5, Math.PI / 2, 'z', "black"); // right wheel 1
+    addCilinder(inferiorMembers, 17.5, 15, 37.5, -60, 5, Math.PI / 2, 'z', "black"); // left wheel 2
+    addCilinder(inferiorMembers, 17.5, 15, -37.5, -60, 5, Math.PI / 2, 'z', "black"); // right wheel 2
+    addCilinder(inferiorMembers, 17.5, 15, 37.5, -105, 5, Math.PI / 2, 'z', "black"); // left wheel 3
+    addCilinder(inferiorMembers, 17.5, 15, -37.5, -105, 5, Math.PI / 2, 'z', "black"); // right wheel 3 
 }
 
 function createFeet(inferiorMembers) {
     'use strict';
-    addCube(inferiorMembers, 32.5, 10, 30, 37.5/2, -185+67.5, 0, "blue"); // left foot
-    addCube(inferiorMembers, 32.5, 10, 30, -37.5/2, -185+67.5, 0, "blue"); // right foot
+    addCube(inferiorMembers, 32.5, 10, 30, 18.75, -132.25, 0, "blue"); // left foot
+    addCube(inferiorMembers, 32.5, 10, 30, -18.75, -132.25, 0, "blue"); // right foot
 
     //robot.add(inferiorMembers);
 }
@@ -361,7 +359,7 @@ function onKeyDown(e) {
             break;
         case 69: // E
             animationFlags.set("E_arms", !animationFlags.get("E_arms"));
-            break ;
+            break;
         case 68: // D
             animationFlags.set("D_arms", !animationFlags.get("D_arms"));
             break;
@@ -370,7 +368,7 @@ function onKeyDown(e) {
             break;
         case 83: // S
             animationFlags.set("S_legs", !animationFlags.get("S_legs"));
-            break
+            break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
             break;
