@@ -312,7 +312,7 @@ function init() {
     createScene();
     createCamera();
 
-    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
+    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
@@ -401,7 +401,7 @@ function animate() {
          
     render();
 
-    controls.update();
+    //controls.update();
     //stats.update();
 
     requestAnimationFrame(animate);
