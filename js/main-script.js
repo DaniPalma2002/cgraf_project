@@ -31,6 +31,7 @@ var colors = new Map([
     ["white", 0xFFFFFF],
     ["black", 0x000000],
     ["silver", 0xC0C0C0],
+    ["iron", 0xA19D94],
     ["light red", 0xFFA07A],
     ["dark red", 0x8B0000],
     ["light green", 0x90EE90],
@@ -120,8 +121,11 @@ function createChest() {
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
     addCube(chest, 60, 20, 80, 0, -40, 0, "dark red"); // abdomen
     addCube(chest, 60, 10, 80, 0, -55, 0, "silver"); // waist
+    
     createHead();
     createSuperiorMembers();
+    createInferiorMembers();
+
     chest.position.set(100, 50, 40);
 
     robot.add(chest);
@@ -158,6 +162,42 @@ function createSuperiorMembers() {
     leftMember.position.set(60, 0, 0);
     
     chest.add(rightMember, leftMember);
+}
+
+function createInferiorMembers() {
+    'use strict';
+    var geometry = new THREE.BoxGeometry(0, 0, 0);
+    var material = new THREE.MeshBasicMaterial();
+    var inferiorMembers = new THREE.Mesh(geometry, material);
+    createLegs(inferiorMembers);
+    createFeet(inferiorMembers);
+
+    chest.add(inferiorMembers);
+    
+}
+
+function createLegs(inferiorMembers) {
+    'use strict';
+    addCube(inferiorMembers, 15, 50, 15, 15, -85, 0, "silver"); // left thigh
+    addCube(inferiorMembers, 15, 50, 15, -15, -85, 0, "silver"); // right thigh
+    addCube(inferiorMembers, 27.5, 70, 20, 15 + 2.5/2, -145, 0, "dark blue"); // left leg
+    addCube(inferiorMembers, 27.5, 70, 20, -15 - 2.5/2, -145, 0, "dark blue"); // right leg
+    addCilinder(inferiorMembers, 15, 10, 35, -65, 0, Math.PI / 2, 'z', "black"); // left wheel 1
+    addCilinder(inferiorMembers, 15, 10, 35, -125, 0, Math.PI / 2, 'z', "black"); // left wheel 2
+    addCilinder(inferiorMembers, 15, 10, 35, -160, 0, Math.PI / 2, 'z', "black"); // left wheel 3
+    addCilinder(inferiorMembers, 15, 10, -35, -65, 0, Math.PI / 2, 'z', "black"); // right wheel 1
+    addCilinder(inferiorMembers, 15, 10, -35, -125, 0, Math.PI / 2, 'z', "black"); // right wheel 2
+    addCilinder(inferiorMembers, 15, 10, -35, -160, 0, Math.PI / 2, 'z', "black"); // right wheel 3
+
+    robot.add(inferiorMembers);
+}
+
+function createFeet(inferiorMembers) {
+    'use strict';
+    addCube(inferiorMembers, 32.5, 10, 30, 37.5/2, -185, 0, "blue"); // left foot
+    addCube(inferiorMembers, 32.5, 10, 30, -37.5/2, -185, 0, "blue"); // right foot
+
+    robot.add(inferiorMembers);
 }
 
 function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
