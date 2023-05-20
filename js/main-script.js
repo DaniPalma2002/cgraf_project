@@ -88,7 +88,8 @@ function createCamera() {
     cameraTop.lookAt(scene.position);
 
     // Orthographic camera for isometric view
-    cameraOrtho = new THREE.OrthographicCamera(-200, 200, 200, -200, 1, 1000);
+    cameraOrtho = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
     cameraOrtho.position.set(200, 200, 200);
     cameraOrtho.lookAt(scene.position);
 
