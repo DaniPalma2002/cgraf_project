@@ -10,6 +10,7 @@ var geometry, mesh;
 var robot, trailer;
 
 var chest, head, rightMember, leftMember, legs, feet;
+var speed = 1;
 
 var controls, stats;
 
@@ -350,53 +351,47 @@ function animate() {
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
-                        feet.rotation.x += Math.PI/16;
-                    animationFlags.set(key, false);
+                        feet.rotation.x += Math.PI/16 * speed;
                     break;
                 case "A_feet":
                     if (feet.rotation.x > 0)
-                        feet.rotation.x -= Math.PI/16;
-                    animationFlags.set(key, false);
+                        feet.rotation.x -= Math.PI/16 * speed;
                     break;
                 case "W_legs":
                     if (legs.rotation.x < Math.PI/2)
-                        legs.rotation.x += Math.PI/16;
-                    animationFlags.set(key, false);
+                        legs.rotation.x += Math.PI/16 * speed;
                     break;
                 case "S_legs":
                     if (legs.rotation.x > 0)
-                        legs.rotation.x -= Math.PI/16;
-                    animationFlags.set(key, false);
+                        legs.rotation.x -= Math.PI/16 * speed;
                     break;
                 case "E_arms":
                     if (leftMember.position.x - 60 > -20 && rightMember.position.x + 60 < 20) {
-                        leftMember.position.x -= 1;
-                        rightMember.position.x += 1;
+                        leftMember.position.x -= speed;
+                        rightMember.position.x += speed;
                     }
-                    animationFlags.set(key, false);
                     break;
                 case "D_arms":
                     if (leftMember.position.x - 60 < 0 && rightMember.position.x + 60 > 0) {
-                        leftMember.position.x += 1;
-                        rightMember.position.x -= 1;
+                        leftMember.position.x += speed;
+                        rightMember.position.x -= speed;
                     }
-                    animationFlags.set(key, false);
                     break;
                 case "R_head":
                     if (head.rotation.x > -Math.PI)
-                        head.rotation.x -= Math.PI/16;
-                    animationFlags.set(key, false);
+                        head.rotation.x -= Math.PI/16 * speed;
                     break;
                 case "F_head":
                     if (head.rotation.x < 0)
-                        head.rotation.x += Math.PI/16;
-                    animationFlags.set(key, false);
+                        head.rotation.x += Math.PI/16 * speed;
                     break
             }
         }
+        animationFlags.set(key, false);
     }
 
-    if (wireframeFlag) {
+    // TODO do it like this of sava all created meshes in a global list?
+    if (wireframeFlag) { 
         scene.traverse(function (node) {
             if (node instanceof THREE.Mesh)
                 node.material.wireframe = !node.material.wireframe;
