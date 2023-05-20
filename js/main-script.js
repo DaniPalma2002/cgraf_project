@@ -120,7 +120,7 @@ function createRobot() {
     'use strict'
     robot = new THREE.Object3D();
     createChest();
-
+    
     scene.add(robot);
 }
 
@@ -130,12 +130,12 @@ function createChest() {
     addCube(chest, 100, 60, 80, 0, 0, 0, "red"); // torso
     addCube(chest, 60, 20, 75, 0, -40, 0, "dark red"); // abdomen
     addCube(chest, 60, 10, 75, 0, -55, 0, "silver"); // waist
-    //addCube(chest, 200, 1, 10000000, 0, -90, 0, "black");
 
     createHead();
     createSuperiorMembers();
     createLegs();
 
+    //console.log(chest.children[4].children[1].position)
     //chest.position.set(100, 100, 100);
 
     robot.add(chest);
@@ -268,16 +268,33 @@ function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
-function checkCollisions(){
+function checkCollisions() {
     'use strict';
 
+}
+
+function getMaxMinPoints(obj) {
+    'use strict';
+    var vectorMax = new THREE.Vector3(-Infinity, -Infinity, -Infinity) ;
+    var vectorMin = new THREE.Vector3(Infinity, Infinity, Infinity) ;
+    obj.traverse(function (node) {
+        if (node instanceof THREE.Mesh || node instanceof THREE.Object3D) {
+            var nodePos = new THREE.Vector3();
+            node.getWorldPosition(nodePos);
+            vectorMax.max(nodePos);
+            vectorMin.min(nodePos);
+        }
+    });
+    return {vectorMax, vectorMin}
 }
 
 ///////////////////////
 /* HANDLE COLLISIONS */
 ///////////////////////
-function handleCollisions(){
+function handleCollisions() {
     'use strict';
+    vector = THREE.Vector3(robot.position.x, robot.position.y, robot.position.z + 200);
+    trailer.position.set(vector);
 
 }
 
@@ -350,6 +367,7 @@ function animate() {
     trailer.position.add(newTrailerVector);
     for (let [key, value] of animationFlags) {
         if (value) {
+            console.log(getMaxMinPoints(robot));
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
