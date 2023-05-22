@@ -185,10 +185,10 @@ function createSuperiorMembers() {
     addCube(rightMember, 20, 20, 80, 0, -40, 0, "dark red"); // right forearm
     addCilinder(leftMember, 5, 80, 15, 10, -32.5, 0, 0, "silver"); // left pipe
     addCilinder(rightMember, 5, 80, -15, 10, -32.5, 0, 0, "silver"); // right pipe
- 
+
     rightMember.position.set(-60, 0, 0);
     leftMember.position.set(60, 0, 0);
-    
+
     chest.add(rightMember, leftMember);
 }
 
@@ -206,11 +206,11 @@ function createLegs() {
     addCilinder(legs, 17.5, 15, 37.5, -60, 5, Math.PI / 2, 'z', "black"); // left wheel 2
     addCilinder(legs, 17.5, 15, -37.5, -60, 5, Math.PI / 2, 'z', "black"); // right wheel 2
     addCilinder(legs, 17.5, 15, 37.5, -105, 5, Math.PI / 2, 'z', "black"); // left wheel 3
-    addCilinder(legs, 17.5, 15, -37.5, -105, 5, Math.PI / 2, 'z', "black"); // right wheel 3 
-    
+    addCilinder(legs, 17.5, 15, -37.5, -105, 5, Math.PI / 2, 'z', "black"); // right wheel 3
+
     createFeet(legs);
     legs.position.y = -67.5
-    
+
     chest.add(legs);
 }
 
@@ -301,11 +301,11 @@ function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
 //////////////////////
 function checkCollisions() {
     'use strict';
-    if (minRobotVec.z < maxTrailerVec.z && 
+    if (minRobotVec.z < maxTrailerVec.z &&
         maxRobotVec.z > minTrailerVec.z &&
-        maxRobotVec.x > minTrailerVec.x && 
-        minRobotVec.x < maxTrailerVec.x && 
-        maxRobotVec.y > minTrailerVec.y && 
+        maxRobotVec.x > minTrailerVec.x &&
+        minRobotVec.x < maxTrailerVec.x &&
+        maxRobotVec.y > minTrailerVec.y &&
         minRobotVec.y < maxTrailerVec.y) {
         console.log("collision");
         collision = true;
@@ -355,7 +355,7 @@ function init() {
     createScene();
     createCamera();
 
-    controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
+    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
 
     render();
 
@@ -378,7 +378,7 @@ function animate() {
             minTrailerVec = new THREE.Vector3(-55, -115, -155);
             minTrailerVec.add(trailer.position);
             maxTrailerVec.add(trailer.position);
-            if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 && 
+            if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 &&
                 head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
                 leftMember.position.x - 60 <= -20) {
                 checkCollisions();
@@ -387,8 +387,8 @@ function animate() {
             var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
             helper = new THREE.Mesh(geometry, material);
             helper.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
-            scene.add(helper); */ 
-            
+            scene.add(helper); */
+
             switch (key) {
                 case "UP":
                     newTrailerVector.z += 2;
@@ -408,7 +408,7 @@ function animate() {
     trailer.position.add(newTrailerVector);
     for (let [key, value] of animationFlags) {
         if (value) {
-            
+
             /* scene.remove(helper);
             helper = new THREE.BoxHelper(robot, 0x000000);
             helper.update();
@@ -457,18 +457,18 @@ function animate() {
         animationFlags.set(key, false);
     }
 
-    // TODO do it like this of sava all created meshes in a global list?
-    if (wireframeFlag) { 
+    // TODO do it like this of save all created meshes in a global list?
+    if (wireframeFlag) {
         scene.traverse(function (node) {
             if (node instanceof THREE.Mesh)
                 node.material.wireframe = !node.material.wireframe;
         });
         wireframeFlag = false;
     }
-         
+
     render();
 
-    controls.update();
+    //controls.update();
 
     requestAnimationFrame(animate);
 }
@@ -539,14 +539,14 @@ function onKeyDown(e) {
             break;
         case 54: // 6 key (wireframe)
             wireframeFlag = !wireframeFlag;
-            break; 
+            break;
     }
 }
 
 ///////////////////////
 /* KEY UP CALLBACK */
 ///////////////////////
-function onKeyUp(e){
+function onKeyUp(e) {
     'use strict';
     switch (e.keyCode) {
         case 37: // Arrow Left
