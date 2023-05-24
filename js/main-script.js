@@ -19,6 +19,8 @@ var controls, stats;
 
 var helper;
 
+var clock, delta;
+
 var animationFlags = new Map([
     ["Q_feet", false],
     ["A_feet", false],
@@ -39,7 +41,7 @@ var trailerFlags = new Map([
 
 var wireframeFlag = false;
 
-var inAnimation = false, animationFrames = 120, animationMovement;
+var inAnimation = false, animationParts = 120, animationMovement;
 
 
 var colors = new Map([
@@ -283,7 +285,6 @@ function checkCollisions() {
         minRobotVec.y < maxTrailerVec.y) {
         console.log("collision");
         collision = true;
-        handleCollisions();
     }
 }
 
@@ -295,15 +296,15 @@ function handleCollisions() {
     inAnimation = true;
     let xSrc = new THREE.Vector3(trailer.position.x, 0, 0);
     let xDest = new THREE.Vector3(robot.position.x, 0, 0);
-    let xDist = (xSrc.distanceTo(xDest) / animationFrames);
+    let xDist = (xSrc.distanceTo(xDest) / animationParts) + delta;
     if (trailer.position.x > robot.position.x)
         xDist *= -1;
     let ySrc = new THREE.Vector3(0, trailer.position.y, 0);
     let yDest = new THREE.Vector3(0, robot.position.y + trailer.position.y, 0);
-    let yDist = (ySrc.distanceTo(yDest) / animationFrames);
+    let yDist = (ySrc.distanceTo(yDest) / animationParts) + delta;
     let zSrc = new THREE.Vector3(0, 0, trailer.position.z);
     let zDest = new THREE.Vector3(0, 0, robot.position.z - 210);
-    let zDist = (zSrc.distanceTo(zDest) / animationFrames);
+    let zDist = (zSrc.distanceTo(zDest) / animationParts) + delta;
     if (trailer.position.z > robot.position.z - 210)
         zDist *= -1;
     animationMovement = new THREE.Vector3(xDist, yDist, zDist);
@@ -314,6 +315,10 @@ function handleCollisions() {
 ////////////
 function update() {
     'use strict';
+    checkCollisions();
+    if(collision){
+        handleCollisions();
+    }
 
 }
 
@@ -339,6 +344,8 @@ function init() {
     createScene();
     createCamera();
 
+    clock = new THREE.Clock(true);
+
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
 }
@@ -349,12 +356,13 @@ function init() {
 function animate() {
     'use strict';
     // TODO use of vectors and speed, not so hardcoded
+    delta = clock.getDelta()
     if (inAnimation) {
         trailer.position.add(animationMovement);
-        animationFrames--;
-        if (animationFrames == 0) {
+        animationParts--;
+        if (animationParts == 0) {
             inAnimation = false;
-            animationFrames = 120;
+            animationParts = 120;
         }
     }
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
@@ -369,7 +377,7 @@ function animate() {
                 if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 &&
                     head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
                     leftMember.position.x - 60 <= -20) {
-                    checkCollisions();
+                    update();
                 }
             }
 
