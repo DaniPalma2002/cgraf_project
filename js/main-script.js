@@ -39,6 +39,9 @@ var trailerFlags = new Map([
 
 var wireframeFlag = false;
 
+var inAnimation = false, animationFrames = 120, animationMovement;
+
+
 var colors = new Map([
     ["red", 0xFF0000],
     ["green", 0x00FF00],
@@ -318,8 +321,21 @@ function checkCollisions() {
 ///////////////////////
 function handleCollisions() {
     'use strict';
-    trailer.position.set(robot.position.x, robot.position.y + trailer.position.y, robot.position.z - 210);
-
+    inAnimation = true;
+    let xSrc = new THREE.Vector3(trailer.position.x, 0, 0);
+    let xDest = new THREE.Vector3(robot.position.x, 0, 0);
+    let xDist = (xSrc.distanceTo(xDest) / animationFrames);
+    if (trailer.position.x > robot.position.x)
+        xDist *= -1;
+    let ySrc = new THREE.Vector3(0, trailer.position.y, 0);
+    let yDest = new THREE.Vector3(0, robot.position.y + trailer.position.y, 0);
+    let yDist = (ySrc.distanceTo(yDest) / animationFrames);
+    let zSrc = new THREE.Vector3(0, 0, trailer.position.z);
+    let zDest = new THREE.Vector3(0, 0, robot.position.z - 210);
+    let zDist = (zSrc.distanceTo(zDest) / animationFrames);
+    if (trailer.position.z > robot.position.z - 210)
+        zDist *= -1;
+    animationMovement = new THREE.Vector3(xDist, yDist, zDist);
 }
 
 ////////////
@@ -369,6 +385,14 @@ function init() {
 function animate() {
     'use strict';
     // TODO use of vectors and speed, not so hardcoded
+    if (inAnimation) {
+        trailer.position.add(animationMovement);
+        animationFrames--;
+        if (animationFrames == 0) {
+            inAnimation = false;
+            animationFrames = 120;
+        }
+    }
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
     for (let [key, value] of trailerFlags) {
         if (value) {
@@ -378,17 +402,18 @@ function animate() {
             minTrailerVec = new THREE.Vector3(-55, -115, -155);
             minTrailerVec.add(trailer.position);
             maxTrailerVec.add(trailer.position);
-            if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 &&
-                head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
-                leftMember.position.x - 60 <= -20) {
-                checkCollisions();
+            if (!inAnimation) {
+                if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 &&
+                    head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
+                    leftMember.position.x - 60 <= -20) {
+                    checkCollisions();
+                }
             }
             /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
             var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
             helper = new THREE.Mesh(geometry, material);
             helper.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
             scene.add(helper); */
-
             switch (key) {
                 case "UP":
                     newTrailerVector.z += 2;
@@ -487,40 +512,52 @@ function onKeyDown(e) {
     'use strict';
     switch (e.keyCode) {
         case 37: // Arrow Left
-            trailerFlags.set("LEFT", true);
+            if (!inAnimation)
+                trailerFlags.set("LEFT", true);
             break;
         case 38: // Arrow Up
-            trailerFlags.set("UP", true);
+            if (!inAnimation)
+                trailerFlags.set("UP", true);
             break;
         case 39: // Arrow Right
-            trailerFlags.set("RIGHT", true);
+            if (!inAnimation)
+                trailerFlags.set("RIGHT", true);
             break;
         case 40: // Arrow Down
-            trailerFlags.set("DOWN", true);
+            if (!inAnimation)
+                trailerFlags.set("DOWN", true);
             break;
         case 70: // F
-            animationFlags.set("F_head", !animationFlags.get("F_head"));
+            if (!inAnimation)
+                animationFlags.set("F_head", !animationFlags.get("F_head"));
             break;
         case 82: // R
-            animationFlags.set("R_head", !animationFlags.get("R_head"));
+            if (!inAnimation)
+                animationFlags.set("R_head", !animationFlags.get("R_head"));
             break;
         case 69: // E
-            animationFlags.set("E_arms", !animationFlags.get("E_arms"));
+            if (!inAnimation)
+                animationFlags.set("E_arms", !animationFlags.get("E_arms"));
             break;
         case 68: // D
-            animationFlags.set("D_arms", !animationFlags.get("D_arms"));
+            if (!inAnimation)
+                animationFlags.set("D_arms", !animationFlags.get("D_arms"));
             break;
         case 87: // W
-            animationFlags.set("W_legs", !animationFlags.get("W_legs"));
+            if (!inAnimation)
+                animationFlags.set("W_legs", !animationFlags.get("W_legs"));
             break;
         case 83: // S
-            animationFlags.set("S_legs", !animationFlags.get("S_legs"));
+            if (!inAnimation)
+                animationFlags.set("S_legs", !animationFlags.get("S_legs"));
             break;
         case 81: // Q
-            animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
+            if (!inAnimation)
+                animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
             break;
         case 65: // A
-            animationFlags.set("A_feet", !animationFlags.get("A_feet"));
+            if (!inAnimation)
+                animationFlags.set("A_feet", !animationFlags.get("A_feet"));
             break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
