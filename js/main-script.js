@@ -41,7 +41,8 @@ var trailerFlags = new Map([
 
 var wireframeFlag = false;
 
-var inAnimation = false, animationParts = 120, animationMovement;
+var inAnimation = false, animationParts = 120, animationMovement, animationType;
+var attached = false
 
 
 var colors = new Map([
@@ -307,7 +308,23 @@ function handleCollisions() {
     let zDist = (zSrc.distanceTo(zDest) / animationParts) + delta;
     if (trailer.position.z > robot.position.z - 210)
         zDist *= -1;
+    animationType = "attach"
     animationMovement = new THREE.Vector3(xDist, yDist, zDist);
+}
+
+///////////////////////
+/* Unattach Animation */
+///////////////////////
+function unattachAnimation() {
+    'use strict';
+    inAnimation = true;
+    let zSrc = new THREE.Vector3(0, 0, trailer.position.z);
+    let zDest = new THREE.Vector3(0, 0, robot.position.z - 400);
+    let zDist = (zSrc.distanceTo(zDest) / animationParts) + delta;
+    if (trailer.position.z > robot.position.z - 400)
+        zDist *= -1;
+    animationType = "unattach";
+    animationMovement = new THREE.Vector3(0, 0, zDist);
 }
 
 ////////////
@@ -363,6 +380,11 @@ function animate() {
         if (animationParts == 0) {
             inAnimation = false;
             animationParts = 120;
+            collision = false;
+            if (animationType == "attach")
+                attached = true;
+            else
+                attached = false;
         }
     }
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
@@ -472,18 +494,26 @@ function onKeyDown(e) {
         case 37: // Arrow Left
             if (!inAnimation)
                 trailerFlags.set("LEFT", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 38: // Arrow Up
             if (!inAnimation)
                 trailerFlags.set("UP", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 39: // Arrow Right
             if (!inAnimation)
                 trailerFlags.set("RIGHT", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 40: // Arrow Down
             if (!inAnimation)
                 trailerFlags.set("DOWN", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 70: // F
             if (!inAnimation)
