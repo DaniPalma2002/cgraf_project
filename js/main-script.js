@@ -128,19 +128,11 @@ function createRobot() {
     'use strict'
     robot = new THREE.Object3D();
     createChest();
-    //robot.position.set(10, 30, 20);
 
     maxRobotVec = new THREE.Vector3(60, 50, 40);
     minRobotVec = new THREE.Vector3(-60, -90, -160);
     minRobotVec.add(robot.position);
     maxRobotVec.add(robot.position);
-
-    /* geometry = new THREE.BoxGeometry(maxRobotVec.x-minRobotVec.x, maxRobotVec.y-minRobotVec.y, maxRobotVec.z-minRobotVec.z);
-    var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set((maxRobotVec.x+minRobotVec.x)/2, (maxRobotVec.y+minRobotVec.y)/2, (maxRobotVec.z+minRobotVec.z)/2);
-    scene.add(mesh); */
-
 
     scene.add(robot);
 }
@@ -156,17 +148,12 @@ function createChest() {
     createSuperiorMembers();
     createLegs();
 
-    //console.log(chest.children[4].children[1].position)
-    //chest.position.set(100, 100, 100);
-
     robot.add(chest);
 }
 
 function createHead() {
     'use strict'
-    var geometry = new THREE.BoxGeometry(0, 0, 0);
-    var material = new THREE.MeshBasicMaterial();
-    head = new THREE.Mesh(geometry, material);
+    head = new THREE.Object3D();
     addCube(head, 30, 30, 30, 0, 15, 0, "dark blue"); // head
     addCube(head, 7.5, 5, 2.5, 7.5, 20, 16.25, "silver"); // right eye
     addCube(head, 7.5, 5, 2.5, -7.5, 20, 16.25, "silver"); // left eye
@@ -197,9 +184,7 @@ function createSuperiorMembers() {
 
 function createLegs() {
     'use strict';
-    var geometry = new THREE.BoxGeometry(0, 0, 0);
-    var material = new THREE.MeshBasicMaterial();
-    legs = new THREE.Mesh(geometry, material);
+    legs = new THREE.Object3D();
     addCube(legs, 15, 45, 15, 15, -15, 0, "silver"); // left thigh
     addCube(legs, 15, 45, 15, -15, -15, 0, "silver"); // right thigh
     addCube(legs, 27.5, 90, 20, 16.25, -82.5, 0, "dark blue"); // left leg
@@ -219,9 +204,7 @@ function createLegs() {
 
 function createFeet() {
     'use strict';
-    var geometry = new THREE.BoxGeometry(0);
-    var material = new THREE.MeshBasicMaterial();
-    feet = new THREE.Mesh(geometry, material);
+    feet = new THREE.Object3D();
     addCube(feet, 27.49, 15, 35, 16.25, 0, 7.5, "blue"); // left foot
     addCube(feet, 27.49, 15, 35, -16.25, 0, 7.5, "blue"); // right foot
 
@@ -240,18 +223,6 @@ function createTrailer() {
     addConnector();
     trailer.position.z -=500;
     trailer.position.y += 25;
-
-    /* maxTrailerVec = new THREE.Vector3(55, 65, 155);
-    minTrailerVec = new THREE.Vector3(-55, -115, -155);
-    minTrailerVec.add(trailer.position);
-    maxTrailerVec.add(trailer.position); */
-
-    /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
-    var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
-    scene.add(mesh);  */
-
 
     scene.add(trailer);
 }
@@ -341,7 +312,7 @@ function handleCollisions() {
 ////////////
 /* UPDATE */
 ////////////
-function update(){
+function update() {
     'use strict';
 
 }
@@ -365,15 +336,8 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    //stats = new Stats()
-    //document.body.appendChild(stats.dom)
-
     createScene();
     createCamera();
-
-    //controls = new THREE.OrbitControls(activeCamera, renderer.domElement);
-
-    render();
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
@@ -396,7 +360,6 @@ function animate() {
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
     for (let [key, value] of trailerFlags) {
         if (value) {
-            //scene.remove(helper);
             if (collision) break;
             maxTrailerVec = new THREE.Vector3(55, 65, 155);
             minTrailerVec = new THREE.Vector3(-55, -115, -155);
@@ -409,11 +372,7 @@ function animate() {
                     checkCollisions();
                 }
             }
-            /* geometry = new THREE.BoxGeometry(maxTrailerVec.x-minTrailerVec.x, maxTrailerVec.y-minTrailerVec.y, maxTrailerVec.z-minTrailerVec.z);
-            var material = new THREE.MeshBasicMaterial({ color:colors.get("black"), wireframe:true });
-            helper = new THREE.Mesh(geometry, material);
-            helper.position.set((maxTrailerVec.x+minTrailerVec.x)/2, (maxTrailerVec.y+minTrailerVec.y)/2, (maxTrailerVec.z+minTrailerVec.z)/2);
-            scene.add(helper); */
+
             switch (key) {
                 case "UP":
                     newTrailerVector.z += 2;
@@ -433,13 +392,6 @@ function animate() {
     trailer.position.add(newTrailerVector);
     for (let [key, value] of animationFlags) {
         if (value) {
-
-            /* scene.remove(helper);
-            helper = new THREE.BoxHelper(robot, 0x000000);
-            helper.update();
-            scene.add(helper); */
-            // print helper box dimensions
-
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
@@ -493,9 +445,7 @@ function animate() {
 
     render();
 
-    //controls.update();
-
-    requestAnimationFrame(animate);
+     requestAnimationFrame(animate);
 }
 
 ////////////////////////////
