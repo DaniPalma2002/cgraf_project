@@ -283,7 +283,6 @@ function checkCollisions() {
         minRobotVec.y < maxTrailerVec.y) {
         console.log("collision");
         collision = true;
-        handleCollisions();
     }
 }
 
@@ -314,6 +313,10 @@ function handleCollisions() {
 ////////////
 function update() {
     'use strict';
+    checkCollisions();
+    if(collision){
+        handleCollisions();
+    }
 
 }
 
@@ -369,7 +372,7 @@ function animate() {
                 if (feet.rotation.x >= Math.PI/2 && legs.rotation.x >= Math.PI/2 &&
                     head.rotation.x <= -Math.PI && rightMember.position.x + 60 >= 20 &&
                     leftMember.position.x - 60 <= -20) {
-                    checkCollisions();
+                    update();
                 }
             }
 
