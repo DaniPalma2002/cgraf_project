@@ -516,35 +516,35 @@ function onKeyDown(e) {
                 unattachAnimation();
             break;
         case 70: // F
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("F_head", !animationFlags.get("F_head"));
             break;
         case 82: // R
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("R_head", !animationFlags.get("R_head"));
             break;
         case 69: // E
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("E_arms", !animationFlags.get("E_arms"));
             break;
         case 68: // D
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("D_arms", !animationFlags.get("D_arms"));
             break;
         case 87: // W
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("W_legs", !animationFlags.get("W_legs"));
             break;
         case 83: // S
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("S_legs", !animationFlags.get("S_legs"));
             break;
         case 81: // Q
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
             break;
         case 65: // A
-            if (!inAnimation)
+            if (!inAnimation && !attached)
                 animationFlags.set("A_feet", !animationFlags.get("A_feet"));
             break;
         case 49: // 1 key (front view)
