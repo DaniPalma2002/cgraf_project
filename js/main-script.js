@@ -365,6 +365,7 @@ function init() {
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -461,7 +462,7 @@ function animate() {
                     break
             }
         }
-        animationFlags.set(key, false);
+        // animationFlags.set(key, false);
     }
 
     // TODO do it like this of save all created meshes in a global list?
@@ -475,7 +476,7 @@ function animate() {
 
     render();
 
-     requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
@@ -483,6 +484,12 @@ function animate() {
 ////////////////////////////
 function onResize() {
     'use strict';
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
@@ -517,35 +524,35 @@ function onKeyDown(e) {
             break;
         case 70: // F
             if (!inAnimation && !attached)
-                animationFlags.set("F_head", !animationFlags.get("F_head"));
+                animationFlags.set("F_head", true);
             break;
         case 82: // R
             if (!inAnimation && !attached)
-                animationFlags.set("R_head", !animationFlags.get("R_head"));
+                animationFlags.set("R_head", true);
             break;
         case 69: // E
             if (!inAnimation && !attached)
-                animationFlags.set("E_arms", !animationFlags.get("E_arms"));
+                animationFlags.set("E_arms", true);
             break;
         case 68: // D
             if (!inAnimation && !attached)
-                animationFlags.set("D_arms", !animationFlags.get("D_arms"));
+                animationFlags.set("D_arms", true);
             break;
         case 87: // W
             if (!inAnimation && !attached)
-                animationFlags.set("W_legs", !animationFlags.get("W_legs"));
+                animationFlags.set("W_legs", true);
             break;
         case 83: // S
             if (!inAnimation && !attached)
-                animationFlags.set("S_legs", !animationFlags.get("S_legs"));
+                animationFlags.set("S_legs", true);
             break;
         case 81: // Q
             if (!inAnimation && !attached)
-                animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
+                animationFlags.set("Q_feet", true);
             break;
         case 65: // A
             if (!inAnimation && !attached)
-                animationFlags.set("A_feet", !animationFlags.get("A_feet"));
+                animationFlags.set("A_feet", true);
             break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
@@ -585,6 +592,30 @@ function onKeyUp(e) {
             break;
         case 40: // Arrow Down
             trailerFlags.set("DOWN", false);
+            break;
+        case 70: // F
+            animationFlags.set("F_head", false);
+            break;
+        case 82: // R
+            animationFlags.set("R_head", false);
+            break;
+        case 69: // E
+            animationFlags.set("E_arms", false);
+            break;
+        case 68: // D
+            animationFlags.set("D_arms", false);
+            break;
+        case 87: // W
+            animationFlags.set("W_legs", false);
+            break;
+        case 83: // S
+            animationFlags.set("S_legs", false);
+            break;
+        case 81: // Q
+            animationFlags.set("Q_feet", false);
+            break;
+        case 65: // A
+            animationFlags.set("A_feet", false);
             break;
     }
 }
