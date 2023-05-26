@@ -285,7 +285,6 @@ function checkCollisions() {
         minRobotVec.x < maxTrailerVec.x &&
         maxRobotVec.y > minTrailerVec.y &&
         minRobotVec.y < maxTrailerVec.y) {
-        console.log("collision");
         collision = true;
     }
 }
