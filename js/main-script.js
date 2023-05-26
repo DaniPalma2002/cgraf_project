@@ -13,7 +13,7 @@ var maxTrailerVec, minTrailerVec;
 var collision = false;
 
 var chest, head, rightMember, leftMember, legs, feet;
-var speed = 1;
+var speed = 10;
 
 var controls, stats;
 
@@ -70,8 +70,6 @@ function createScene() {
     scene = new THREE.Scene();
 
     scene.background = new THREE.Color(0xF8F8F8);
-
-    scene.add(new THREE.AxesHelper(100));
 
     createRobot();
     createTrailer();
@@ -333,7 +331,7 @@ function unattachAnimation() {
 function update() {
     'use strict';
     checkCollisions();
-    if(collision){
+    if (collision) {
         handleCollisions();
     }
 
@@ -373,7 +371,6 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
-    // TODO use of vectors and speed, not so hardcoded
     delta = clock.getDelta()
     if (inAnimation) {
         trailer.position.add(animationMovement);
@@ -426,46 +423,44 @@ function animate() {
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
-                        feet.rotation.x += Math.PI/16 * speed;
+                        feet.rotation.x += Math.PI/16 * speed * delta;
                     break;
                 case "A_feet":
                     if (feet.rotation.x > 0)
-                        feet.rotation.x -= Math.PI/16 * speed;
+                        feet.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "W_legs":
                     if (legs.rotation.x < Math.PI/2)
-                        legs.rotation.x += Math.PI/16 * speed;
+                        legs.rotation.x += Math.PI/16 * speed * delta;
                     break;
                 case "S_legs":
                     if (legs.rotation.x > 0)
-                        legs.rotation.x -= Math.PI/16 * speed;
+                        legs.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "E_arms":
                     if (leftMember.position.x - 60 > -20 && rightMember.position.x + 60 < 20) {
-                        leftMember.position.x -= speed;
-                        rightMember.position.x += speed;
+                        leftMember.position.x -= speed*3 * delta;
+                        rightMember.position.x += speed*3 * delta;
                     }
                     break;
                 case "D_arms":
                     if (leftMember.position.x - 60 < 0 && rightMember.position.x + 60 > 0) {
-                        leftMember.position.x += speed;
-                        rightMember.position.x -= speed;
+                        leftMember.position.x += speed*3 * delta;
+                        rightMember.position.x -= speed*3 * delta;
                     }
                     break;
                 case "R_head":
                     if (head.rotation.x > -Math.PI)
-                        head.rotation.x -= Math.PI/16 * speed;
+                        head.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "F_head":
                     if (head.rotation.x < 0)
-                        head.rotation.x += Math.PI/16 * speed;
+                        head.rotation.x += Math.PI/16 * speed * delta;
                     break
             }
         }
-        // animationFlags.set(key, false);
     }
 
-    // TODO do it like this of save all created meshes in a global list?
     if (wireframeFlag) {
         scene.traverse(function (node) {
             if (node instanceof THREE.Mesh)
