@@ -6,6 +6,7 @@ var scene, renderer;
 var activeCamera;
 
 var geometry, mesh;
+var projectMeshes = [];
 
 var robot, trailer;
 var maxRobotVec, minRobotVec;
@@ -256,6 +257,7 @@ function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
+    projectMeshes.push(mesh);
 }
 
 function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
@@ -268,6 +270,7 @@ function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
     }
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
+    projectMeshes.push(mesh);
 }
 
 
@@ -462,10 +465,10 @@ function animate() {
     }
 
     if (wireframeFlag) {
-        scene.traverse(function (node) {
-            if (node instanceof THREE.Mesh)
-                node.material.wireframe = !node.material.wireframe;
-        });
+        // for each projectMeshes
+        for (let i = 0; i < projectMeshes.length; i++) {
+            projectMeshes[i].material.wireframe = !projectMeshes[i].material.wireframe;
+        }
         wireframeFlag = false;
     }
 
