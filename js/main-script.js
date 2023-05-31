@@ -6,6 +6,7 @@ var scene, renderer;
 var activeCamera;
 
 var geometry, mesh;
+var projectMeshes = [];
 
 var robot, trailer;
 var maxRobotVec, minRobotVec;
@@ -13,11 +14,13 @@ var maxTrailerVec, minTrailerVec;
 var collision = false;
 
 var chest, head, rightMember, leftMember, legs, feet;
-var speed = 1;
+var speed = 10;
 
 var controls, stats;
 
 var helper;
+
+var clock, delta;
 
 var animationFlags = new Map([
     ["Q_feet", false],
@@ -39,7 +42,8 @@ var trailerFlags = new Map([
 
 var wireframeFlag = false;
 
-var inAnimation = false, animationFrames = 120, animationMovement;
+var inAnimation = false, animationParts = 120, animationMovement, animationType;
+var attached = false
 
 
 var colors = new Map([
@@ -67,8 +71,6 @@ function createScene() {
     scene = new THREE.Scene();
 
     scene.background = new THREE.Color(0xF8F8F8);
-
-    scene.add(new THREE.AxesHelper(100));
 
     createRobot();
     createTrailer();
@@ -255,6 +257,7 @@ function addCube(obj, Sx, Sy, Sz, Vx, Vy, Vz, color) {
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
+    projectMeshes.push(mesh);
 }
 
 function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
@@ -267,6 +270,7 @@ function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
     }
     mesh.position.set(Vx, Vy, Vz);
     obj.add(mesh);
+    projectMeshes.push(mesh);
 }
 
 
@@ -281,7 +285,6 @@ function checkCollisions() {
         minRobotVec.x < maxTrailerVec.x &&
         maxRobotVec.y > minTrailerVec.y &&
         minRobotVec.y < maxTrailerVec.y) {
-        console.log("collision");
         collision = true;
     }
 }
@@ -294,18 +297,34 @@ function handleCollisions() {
     inAnimation = true;
     let xSrc = new THREE.Vector3(trailer.position.x, 0, 0);
     let xDest = new THREE.Vector3(robot.position.x, 0, 0);
-    let xDist = (xSrc.distanceTo(xDest) / animationFrames);
+    let xDist = (xSrc.distanceTo(xDest) / animationParts) + delta;
     if (trailer.position.x > robot.position.x)
         xDist *= -1;
     let ySrc = new THREE.Vector3(0, trailer.position.y, 0);
     let yDest = new THREE.Vector3(0, robot.position.y + trailer.position.y, 0);
-    let yDist = (ySrc.distanceTo(yDest) / animationFrames);
+    let yDist = (ySrc.distanceTo(yDest) / animationParts) + delta;
     let zSrc = new THREE.Vector3(0, 0, trailer.position.z);
     let zDest = new THREE.Vector3(0, 0, robot.position.z - 210);
-    let zDist = (zSrc.distanceTo(zDest) / animationFrames);
+    let zDist = (zSrc.distanceTo(zDest) / animationParts) + delta;
     if (trailer.position.z > robot.position.z - 210)
         zDist *= -1;
+    animationType = "attach"
     animationMovement = new THREE.Vector3(xDist, yDist, zDist);
+}
+
+///////////////////////
+/* Unattach Animation */
+///////////////////////
+function unattachAnimation() {
+    'use strict';
+    inAnimation = true;
+    let zSrc = new THREE.Vector3(0, 0, trailer.position.z);
+    let zDest = new THREE.Vector3(0, 0, robot.position.z - 400);
+    let zDist = (zSrc.distanceTo(zDest) / animationParts) + delta;
+    if (trailer.position.z > robot.position.z - 400)
+        zDist *= -1;
+    animationType = "unattach";
+    animationMovement = new THREE.Vector3(0, 0, zDist);
 }
 
 ////////////
@@ -314,7 +333,7 @@ function handleCollisions() {
 function update() {
     'use strict';
     checkCollisions();
-    if(collision){
+    if (collision) {
         handleCollisions();
     }
 
@@ -342,8 +361,11 @@ function init() {
     createScene();
     createCamera();
 
+    clock = new THREE.Clock(true);
+
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -351,13 +373,18 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
-    // TODO use of vectors and speed, not so hardcoded
+    delta = clock.getDelta()
     if (inAnimation) {
         trailer.position.add(animationMovement);
-        animationFrames--;
-        if (animationFrames == 0) {
+        animationParts--;
+        if (animationParts == 0) {
             inAnimation = false;
-            animationFrames = 120;
+            animationParts = 120;
+            collision = false;
+            if (animationType == "attach")
+                attached = true;
+            else
+                attached = false;
         }
     }
     let newTrailerVector = new THREE.Vector3(0, 0, 0);
@@ -398,57 +425,55 @@ function animate() {
             switch (key) {
                 case "Q_feet":
                     if (feet.rotation.x < Math.PI/2)
-                        feet.rotation.x += Math.PI/16 * speed;
+                        feet.rotation.x += Math.PI/16 * speed * delta;
                     break;
                 case "A_feet":
                     if (feet.rotation.x > 0)
-                        feet.rotation.x -= Math.PI/16 * speed;
+                        feet.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "W_legs":
                     if (legs.rotation.x < Math.PI/2)
-                        legs.rotation.x += Math.PI/16 * speed;
+                        legs.rotation.x += Math.PI/16 * speed * delta;
                     break;
                 case "S_legs":
                     if (legs.rotation.x > 0)
-                        legs.rotation.x -= Math.PI/16 * speed;
+                        legs.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "E_arms":
                     if (leftMember.position.x - 60 > -20 && rightMember.position.x + 60 < 20) {
-                        leftMember.position.x -= speed;
-                        rightMember.position.x += speed;
+                        leftMember.position.x -= speed*3 * delta;
+                        rightMember.position.x += speed*3 * delta;
                     }
                     break;
                 case "D_arms":
                     if (leftMember.position.x - 60 < 0 && rightMember.position.x + 60 > 0) {
-                        leftMember.position.x += speed;
-                        rightMember.position.x -= speed;
+                        leftMember.position.x += speed*3 * delta;
+                        rightMember.position.x -= speed*3 * delta;
                     }
                     break;
                 case "R_head":
                     if (head.rotation.x > -Math.PI)
-                        head.rotation.x -= Math.PI/16 * speed;
+                        head.rotation.x -= Math.PI/16 * speed * delta;
                     break;
                 case "F_head":
                     if (head.rotation.x < 0)
-                        head.rotation.x += Math.PI/16 * speed;
+                        head.rotation.x += Math.PI/16 * speed * delta;
                     break
             }
         }
-        animationFlags.set(key, false);
     }
 
-    // TODO do it like this of save all created meshes in a global list?
     if (wireframeFlag) {
-        scene.traverse(function (node) {
-            if (node instanceof THREE.Mesh)
-                node.material.wireframe = !node.material.wireframe;
-        });
+        // for each projectMeshes
+        for (let i = 0; i < projectMeshes.length; i++) {
+            projectMeshes[i].material.wireframe = !projectMeshes[i].material.wireframe;
+        }
         wireframeFlag = false;
     }
 
     render();
 
-     requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
@@ -456,6 +481,12 @@ function animate() {
 ////////////////////////////
 function onResize() {
     'use strict';
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
@@ -467,50 +498,58 @@ function onKeyDown(e) {
         case 37: // Arrow Left
             if (!inAnimation)
                 trailerFlags.set("LEFT", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 38: // Arrow Up
             if (!inAnimation)
                 trailerFlags.set("UP", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 39: // Arrow Right
             if (!inAnimation)
                 trailerFlags.set("RIGHT", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 40: // Arrow Down
             if (!inAnimation)
                 trailerFlags.set("DOWN", true);
+            if (attached)
+                unattachAnimation();
             break;
         case 70: // F
-            if (!inAnimation)
-                animationFlags.set("F_head", !animationFlags.get("F_head"));
+            if (!inAnimation && !attached)
+                animationFlags.set("F_head", true);
             break;
         case 82: // R
-            if (!inAnimation)
-                animationFlags.set("R_head", !animationFlags.get("R_head"));
+            if (!inAnimation && !attached)
+                animationFlags.set("R_head", true);
             break;
         case 69: // E
-            if (!inAnimation)
-                animationFlags.set("E_arms", !animationFlags.get("E_arms"));
+            if (!inAnimation && !attached)
+                animationFlags.set("E_arms", true);
             break;
         case 68: // D
-            if (!inAnimation)
-                animationFlags.set("D_arms", !animationFlags.get("D_arms"));
+            if (!inAnimation && !attached)
+                animationFlags.set("D_arms", true);
             break;
         case 87: // W
-            if (!inAnimation)
-                animationFlags.set("W_legs", !animationFlags.get("W_legs"));
+            if (!inAnimation && !attached)
+                animationFlags.set("W_legs", true);
             break;
         case 83: // S
-            if (!inAnimation)
-                animationFlags.set("S_legs", !animationFlags.get("S_legs"));
+            if (!inAnimation && !attached)
+                animationFlags.set("S_legs", true);
             break;
         case 81: // Q
-            if (!inAnimation)
-                animationFlags.set("Q_feet", !animationFlags.get("Q_feet"));
+            if (!inAnimation && !attached)
+                animationFlags.set("Q_feet", true);
             break;
         case 65: // A
-            if (!inAnimation)
-                animationFlags.set("A_feet", !animationFlags.get("A_feet"));
+            if (!inAnimation && !attached)
+                animationFlags.set("A_feet", true);
             break;
         case 49: // 1 key (front view)
             setActiveCamera(cameraFront);
@@ -550,6 +589,30 @@ function onKeyUp(e) {
             break;
         case 40: // Arrow Down
             trailerFlags.set("DOWN", false);
+            break;
+        case 70: // F
+            animationFlags.set("F_head", false);
+            break;
+        case 82: // R
+            animationFlags.set("R_head", false);
+            break;
+        case 69: // E
+            animationFlags.set("E_arms", false);
+            break;
+        case 68: // D
+            animationFlags.set("D_arms", false);
+            break;
+        case 87: // W
+            animationFlags.set("W_legs", false);
+            break;
+        case 83: // S
+            animationFlags.set("S_legs", false);
+            break;
+        case 81: // Q
+            animationFlags.set("Q_feet", false);
+            break;
+        case 65: // A
+            animationFlags.set("A_feet", false);
             break;
     }
 }
