@@ -12,18 +12,17 @@ function createScene(){
     'use strict';
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xF8F8F8);
-
+    scene.add(new THREE.AxesHelper(100));
 }
 
 //////////////////////
 /* CREATE CAMERA(S) */
 //////////////////////
 function createCamera() {
-    camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(200, 200, 200);
+    camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
+    camera.position.set(100, 100, 100);
     camera.lookAt(scene.position);
-
-    scene.add(camera);
 }
 
 /////////////////////
@@ -35,7 +34,7 @@ function createCamera() {
 ////////////////////////
 function createGround() {
     'use strict';
-    const groundGeo = new THREE.PlaneGeometry(500, 500, 500, 500);
+    const groundGeo = new THREE.PlaneGeometry(500, 500, 250, 250);
     let displayMat = new THREE.TextureLoader()
         .load('../images/heightmap.png');
     
@@ -52,6 +51,36 @@ function createGround() {
     const ground = new THREE.Mesh(groundGeo, groundMat);
     scene.add(ground);
     ground.rotation.x = -Math.PI / 2;
+}
+
+function createHouse() {
+    'use strict';
+    var geometry = new THREE.BufferGeometry();
+    var vertices = [
+        0, 0, 0,  // Vertex 0
+        330, 0, 0,  // Vertex 1
+        330,  100, 0,  // Vertex 2
+        0,  100, 0,  // Vertex 3
+        0, 0,  230,  // Vertex 4
+        330, 0,  230,  // Vertex 5
+        330,  100,  230,  // Vertex 6
+        0,  100,  230   // Vertex 7
+    ];
+    var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
+    geometry.setAttribute('position', positionAttribute);
+    var indices = [
+        1, 2, 0,  0, 2, 3,   // Face 0
+        4, 6, 5,  4, 7, 6,   // Face 1
+        0, 4, 1,  1, 4, 5,   // Face 2
+        1, 5, 2,  2, 5, 6,   // Face 3
+        2, 6, 3,  3, 6, 7,   // Face 4
+        3, 7, 0,  0, 7, 4    // Face 5
+    ];
+    var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
+    geometry.setIndex(indexAttribute);
+    var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+    var cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 }
 
 //////////////////////
@@ -99,7 +128,8 @@ function init() {
 
     createScene();
     createCamera();
-    createGround();
+    //createGround();
+    createHouse();
     
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 }
