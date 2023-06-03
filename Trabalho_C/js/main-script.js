@@ -38,7 +38,7 @@ function createCamera() {
 ////////////////////////
 function createGround() {
     'use strict';
-    const groundGeo = new THREE.PlaneGeometry(500, 500, 250, 250);
+    const groundGeo = new THREE.PlaneGeometry(1000, 1000, 250, 250);
     let displayMat = new THREE.TextureLoader()
         .load('../images/heightmap.png');
     
@@ -49,12 +49,14 @@ function createGround() {
         color: 0x000000,
         wireframe: true,
         displacementMap: displayMat,
-        displacementScale: 50,
+        displacementScale: 40,
     });
 
     const ground = new THREE.Mesh(groundGeo, groundMat);
     scene.add(ground);
     ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -20;
+    ground.position.x = 100;
 }
 
 function createHouse() {
@@ -70,26 +72,27 @@ function createHouse() {
         330,  100,  -230,  // Vertex 6
         0,  100,  -230,   // Vertex 7
         /* door and windows vertices */
+        /* window 1 */
         10, 30, 0,  // Vertex 8
         50, 30, 0,  // Vertex 9
         50, 70, 0,  // Vertex 10
         10, 70, 0,  // Vertex 11
-
+        /* window 2 */
         150, 30, 0,  // Vertex 12
         190, 30, 0,  // Vertex 13
         190, 70, 0,  // Vertex 14
         150, 70, 0,  // Vertex 15
-
+        /* window 3 */
         260, 30, 0,  // Vertex 16
         300, 30, 0,  // Vertex 17
         300, 70, 0,  // Vertex 18
         260, 70, 0,  // Vertex 19
-
+        /* door */
         80, 0, 0,  // Vertex 20
         120, 0, 0,  // Vertex 21
         120, 70, 0,  // Vertex 22
         80, 70, 0,  // Vertex 23
-
+        /* vertices to sub faces 0 */
         0, 70, 0,  // Vertex 24
         330, 70, 0,  // Vertex 25
         10, 0, 0,  // Vertex 26
@@ -97,6 +100,11 @@ function createHouse() {
         80, 30, 0,  // Vertex 28
         120, 30, 0,  // Vertex 29
         330, 30, 0, // Vertex 30
+        /* window 4 */
+        330, 30, -90,  // Vertex 31
+        330, 30, -130,  // Vertex 32
+        330, 70, -130,  // Vertex 33
+        330, 70, -90,  // Vertex 34
 
     ];
     var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
@@ -114,12 +122,12 @@ function createHouse() {
         4, 6, 5,  4, 7, 6,   // Face 1
         0, 4, 1,  1, 4, 5,   // Face 2
         1, 5, 2,  2, 5, 6,   // Face 3
-        //2, 6, 3,  3, 6, 7,   // Face 4
+
         3, 7, 0,  0, 7, 4    // Face 5
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
-    var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+    var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false  });
     var house = new THREE.Mesh(geometry, material);
     addRoof();
     addChimney();
@@ -159,7 +167,7 @@ function addRoof() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
-    var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
+    var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: false });
     roof = new THREE.Mesh(geometry, material);
 }
 
@@ -188,7 +196,7 @@ function addChimney() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
-    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: false });
     chimney = new THREE.Mesh(geometry, material);
 }
 
@@ -230,7 +238,7 @@ function addDoorAndWindows() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
-    var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true });
+    var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
     doorAndWindows = new THREE.Mesh(geometry, material);
 }
 
@@ -279,7 +287,7 @@ function init() {
 
     createScene();
     createCamera();
-    //createGround();
+    createGround();
     createHouse();
     
     controls = new THREE.OrbitControls(camera, renderer.domElement);
