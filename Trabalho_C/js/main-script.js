@@ -4,8 +4,18 @@
 var camera;
 var scene, renderer;
 var controls;
+var skydomeGeo, skydomeMat, skydome;
+var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCockpit;
 
 var house, roof, chimney, doorAndWindows;
+
+var speed = 10;
+var clock, delta;
+
+var OvniFlags = new Map([
+    ["LEFT", false],
+    ["RIGHT", false],
+])
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -242,6 +252,95 @@ function addDoorAndWindows() {
     doorAndWindows = new THREE.Mesh(geometry, material);
 }
 
+function createSkydome() {
+    'use strict';
+    skydomeGeo = new THREE.SphereGeometry(1500, 32, 32);
+    //var texture = new THREE.TextureLoader().load('../images/skydome.jpg');
+    skydomeMat = new THREE.MeshBasicMaterial({ color: 0x000033, side: THREE.BackSide });
+    skydome = new THREE.Mesh(skydomeGeo, skydomeMat);
+    scene.add(skydome);
+}
+
+function createOvniBody(){
+    'use strict';
+    ovniBodyGeo = new THREE.SphereGeometry(125,32,32,0,Math.PI);
+    ovniBodyGeo.rotateX(Math.PI/2);
+    ovniBodyMat = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
+    ovniBody = new THREE.Mesh(ovniBodyGeo,ovniBodyMat);
+    scene.add(ovniBody);
+    ovniBody.position.y = 600;
+
+
+}
+
+function createOvniCockPit(){
+    'use strict';
+    ovniCockpitGeo = new THREE.SphereGeometry(80,32,32,0,Math.PI);
+    ovniCockpitGeo.rotateX(-Math.PI/2);
+    ovniCockpitMat = new THREE.MeshBasicMaterial({ color: 0xADD8E6 });
+    ovniCockpit = new THREE.Mesh(ovniCockpitGeo,ovniCockpitMat);
+    ovniCockpit.position.y = -30;
+    ovniBody.add(ovniCockpit);
+
+
+}
+
+
+function createOvniLights1(){ 
+    'use strict';
+    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
+    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
+    var angle = -Math.PI / 4; 
+    var radius = 75; 
+    ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
+    ovniBody.add(ovniLight);
+
+}
+
+function createOvniLights2(){ 
+    'use strict';
+    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
+    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
+    var angle = Math.PI / 4; 
+    var radius = 75; 
+    ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
+    ovniBody.add(ovniLight);
+}
+
+function createOvniLights3(){ 
+    'use strict';
+    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
+    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
+    var angle = Math.PI / 4; 
+    var radius = 75; 
+    ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
+    ovniBody.add(ovniLight);
+}
+
+function createOvniLights4(){ 
+    'use strict';
+    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
+    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
+    var angle = -Math.PI / 4; 
+    var radius = 75; 
+    ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
+    ovniBody.add(ovniLight);
+}
+
+function createOvniBeam(){
+    var ovniBeamGeo = new THREE.CylinderGeometry(25,25,50,32);
+    var ovniBeamMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
+    var ovniBeam = new THREE.Mesh(ovniBeamGeo,ovniBeamMaterial);
+    ovniBeam.position.y = -110;
+    ovniBody.add(ovniBeam);
+
+}
+
+
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
@@ -288,9 +387,23 @@ function init() {
     createScene();
     createCamera();
     createGround();
+    createSkydome();
     createHouse();
-    
+    createOvniBody();
+    createOvniCockPit();
+    createOvniLights1();
+    createOvniLights2();
+    createOvniLights3();
+    createOvniLights4();
+    createOvniBeam();
+
+    clock = new THREE.Clock(true);
+
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -298,6 +411,22 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
+    delta = clock.getDelta()
+    var newOvniVector = new THREE.Vector3();
+    for (let [key, value] of OvniFlags) {
+    if(value){ 
+        switch (key) {
+            case "LEFT":
+                newOvniVector.x -= 2;
+                break;
+            case "RIGHT":
+                newOvniVector.x += 2;
+                break;
+            }
+        }
+    }
+    ovniBody.position.add(newOvniVector);
+    ovniBody.rotation.y += Math.PI/16* speed * delta;
     render();
     controls.update();
     requestAnimationFrame(animate);
@@ -316,7 +445,14 @@ function onResize() {
 ///////////////////////
 function onKeyDown(e) {
     'use strict';
-
+    switch (e.keyCode) {
+        case 37:
+            OvniFlags.set("LEFT", true);
+            break;
+        case 39:
+            OvniFlags.set("RIGHT", true);
+            break;
+    }
 }
 
 ///////////////////////
@@ -324,5 +460,13 @@ function onKeyDown(e) {
 ///////////////////////
 function onKeyUp(e){
     'use strict';
+    switch (e.keyCode) {
+        case 37: // Arrow Left
+            OvniFlags.set("LEFT", false);
+            break;
+        case 39:
+            OvniFlags.set("RIGHT", false);
+            break;
+    }
 
 }
