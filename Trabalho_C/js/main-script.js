@@ -12,10 +12,11 @@ var house, roof, chimney, doorAndWindows;
 var speed = 10;
 var clock, delta;
 
-var OvniFlags = new Map([
+var ovniflags = new Map([
     ["LEFT", false],
     ["RIGHT", false],
 ])
+
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -340,6 +341,17 @@ function createOvniBeam(){
 
 }
 
+function createOvni(){
+    createOvniBody();
+    createOvniCockPit();
+    createOvniLights1();
+    createOvniLights2();
+    createOvniLights3();
+    createOvniLights4();
+    createOvniBeam();
+
+}
+
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -381,21 +393,23 @@ function init() {
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
+    renderer.xr.enabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    document.body.appendChild( VRButton.createButton( renderer ) );
+
+    renderer.setAnimationLoop( function () {
+
+        renderer.render( scene, camera );
+    
+    } );
 
     createScene();
     createCamera();
     createGround();
     createSkydome();
     createHouse();
-    createOvniBody();
-    createOvniCockPit();
-    createOvniLights1();
-    createOvniLights2();
-    createOvniLights3();
-    createOvniLights4();
-    createOvniBeam();
+    createOvni();
 
     clock = new THREE.Clock(true);
 
@@ -413,7 +427,7 @@ function animate() {
     'use strict';
     delta = clock.getDelta()
     var newOvniVector = new THREE.Vector3();
-    for (let [key, value] of OvniFlags) {
+    for (let [key, value] of ovniflags) {
     if(value){ 
         switch (key) {
             case "LEFT":
@@ -430,6 +444,7 @@ function animate() {
     render();
     controls.update();
     requestAnimationFrame(animate);
+
 }
 
 ////////////////////////////
@@ -447,10 +462,10 @@ function onKeyDown(e) {
     'use strict';
     switch (e.keyCode) {
         case 37:
-            OvniFlags.set("LEFT", true);
+            ovniflags.set("LEFT", true);
             break;
         case 39:
-            OvniFlags.set("RIGHT", true);
+            ovniflags.set("RIGHT", true);
             break;
     }
 }
@@ -462,10 +477,10 @@ function onKeyUp(e){
     'use strict';
     switch (e.keyCode) {
         case 37: // Arrow Left
-            OvniFlags.set("LEFT", false);
+            ovniflags.set("LEFT", false);
             break;
         case 39:
-            OvniFlags.set("RIGHT", false);
+            ovniflags.set("RIGHT", false);
             break;
     }
 
