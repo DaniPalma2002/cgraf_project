@@ -20,6 +20,8 @@ var ovniflags = new Map([
     ["RIGHT", false],
 ])
 
+let ovni = new THREE.Object3D();
+
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -273,96 +275,73 @@ function createSkydome() {
     skydome = new THREE.Mesh(skydomeGeo, skydomeMat);
     scene.add(skydome);
 }
-
-function createOvniBody(){
-    'use strict';
-    ovniBodyGeo = new THREE.SphereGeometry(125,32,32,0,Math.PI);
-    ovniBodyGeo.rotateX(Math.PI/2);
-    ovniBodyMat = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
-    ovniBody = new THREE.Mesh(ovniBodyGeo,ovniBodyMat);
-    scene.add(ovniBody);
-    ovniBody.position.y = 600;
-
-
-}
-
-function createOvniCockPit(){
-    'use strict';
-    ovniCockpitGeo = new THREE.SphereGeometry(80,32,32,0,Math.PI);
-    ovniCockpitGeo.rotateX(-Math.PI/2);
-    ovniCockpitMat = new THREE.MeshBasicMaterial({ color: 0xADD8E6 });
-    ovniCockpit = new THREE.Mesh(ovniCockpitGeo,ovniCockpitMat);
-    ovniCockpit.position.y = -30;
-    ovniBody.add(ovniCockpit);
-
+function addOvniBody(obj,r,d,t){
+    geometry = new THREE.SphereGeometry(r,d,t);
+    geometry.scale(1.5, 0.5, 1.5);
+    material = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
+    mesh = new THREE.Mesh(geometry,material);
+    obj.add(mesh);
 
 }
 
 
-function createOvniLights1(){
+
+
+function addOvniCockPit(obj,r,d,t,a,s){
     'use strict';
-    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
-    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = -Math.PI / 4;
-    var radius = 75;
-    ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
-    ovniBody.add(ovniLight);
+    geometry= new THREE.SphereGeometry(r,d,t,a,s);
+    geometry.rotateX(-Math.PI/2);
+    material = new THREE.MeshBasicMaterial({ color: 0xADD8E6 });
+    mesh = new THREE.Mesh(geometry,material);
+    mesh.position.y = 35;
+    obj.add(mesh);
+
 
 }
 
-function createOvniLights2(){
+
+function addOvniLights1(obj,r,d,radius,angle){ 
     'use strict';
-    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
-    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = Math.PI / 4;
-    var radius = 75;
-    ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
-    ovniBody.add(ovniLight);
+    geometry = new THREE.SphereGeometry(r,d,d);
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    mesh = new THREE.Mesh(geometry,material); 
+    obj.add(mesh);
+    mesh.position.set(radius * Math.cos(angle)*10, -60, radius * Math.sin(angle)*10);
+
 }
 
-function createOvniLights3(){
+function addOvniLights2(obj,r,d,radius,angle){ 
     'use strict';
-    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
-    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = Math.PI / 4;
-    var radius = 75;
-    ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
-    ovniBody.add(ovniLight);
+    geometry = new THREE.SphereGeometry(r,d,d);
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    mesh = new THREE.Mesh(geometry,material); 
+    obj.add(mesh);
+    mesh.position.set(-(radius * Math.cos(angle))*10, -60, radius * Math.sin(angle)*10);
 }
 
-function createOvniLights4(){
-    'use strict';
-    var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
-    var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = -Math.PI / 4;
-    var radius = 75;
-    ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
-    ovniBody.add(ovniLight);
-}
 
-function createOvniBeam(){
+
+function addOvniBeam(obj,r,d,h,t,y){
     'use strict';
-    var ovniBeamGeo = new THREE.CylinderGeometry(25,25,50,32);
-    var ovniBeamMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
-    var ovniBeam = new THREE.Mesh(ovniBeamGeo,ovniBeamMaterial);
-    ovniBeam.position.y = -110;
-    ovniBody.add(ovniBeam);
+    geometry= new THREE.CylinderGeometry(r,d,h,t);
+    material = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
+    mesh= new THREE.Mesh(geometry,material);
+    mesh.position.y = y;
+    obj.add(mesh);
 
 }
 
 function createOvni(){
     'use strict';
-    createOvniBody();
-    createOvniCockPit();
-    createOvniLights1();
-    createOvniLights2();
-    createOvniLights3();
-    createOvniLights4();
-    createOvniBeam();
+    addOvniBody(ovni,125,32,32); 
+    addOvniCockPit(ovni,100,32,32,0,Math.PI);
+    addOvniLights1(ovni,25, 8, 8,50,150,Math.PI / 4);
+    addOvniLights1(ovni,25, 8, 8,-150,-Math.PI / 4);
+    addOvniLights2(ovni,25, 8, 8,150,Math.PI / 4);
+    addOvniLights2(ovni,25, 8, 8,-150,-Math.PI / 4);
+    addOvniBeam(ovni,25,25,50,32,-50);
+    scene.add(ovni);
+    ovni.position.set(0,500,0);
 }
 
 function createTree(Px, Py, Pz, Sx, Sy, Sz) {
@@ -507,8 +486,8 @@ function animate() {
             }
         }
     }
-    ovniBody.position.add(newOvniVector);
-    ovniBody.rotation.y += Math.PI/16* speed * delta;
+    ovni.position.add(newOvniVector);
+    ovni.rotation.y += Math.PI/16* speed * delta;
     render();
     controls.update();
     requestAnimationFrame(animate);
