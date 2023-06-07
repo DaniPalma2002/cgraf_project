@@ -211,6 +211,7 @@ function createHouse() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
+    geometry.computeVertexNormals();
     // var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false  });
     var house = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
     addRoof();
@@ -251,6 +252,7 @@ function addRoof() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
+    geometry.computeVertexNormals();
     // var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: false });
     roof = new THREE.Mesh(geometry, materials.get("ORANGE")[0]);
 }
@@ -280,6 +282,7 @@ function addChimney() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
+    geometry.computeVertexNormals();
     // var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: false });
     chimney = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
 }
@@ -322,8 +325,9 @@ function addDoorAndWindows() {
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
+    geometry.computeVertexNormals();
     // var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
-    doorAndWindows = new THREE.Mesh(geometry, materials.get("ORANGE")[0]);
+    doorAndWindows = new THREE.Mesh(geometry, materials.get("BROWN")[0]);
 }
 
 function createSkydome() {
