@@ -46,6 +46,11 @@ function createCamera() {
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
+function createLight() {
+    light = new THREE.DirectionalLight(0xF0C420, 1);
+    light.position.set(800, 800, 0);
+    scene.add(light);
+}
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
@@ -381,7 +386,7 @@ function createTrees() {
     scene.add(tree3);
 }
 
-function createMoonAndLight() {
+function createMoon() {
     'use strict';
     moon = new THREE.Object3D();
     geometry = new THREE.SphereGeometry(50, 16);
@@ -392,7 +397,7 @@ function createMoonAndLight() {
     mesh.position.set(800, 800, 0);
     moon.add(mesh);
     light = new THREE.DirectionalLight(0xF0C420, 1);
-    light.position.set(mesh.position);
+    light.position.set(800, 800, 0);
     scene.add(moon);
     scene.add(light);
 }
@@ -400,7 +405,8 @@ function createMoonAndLight() {
 function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
     'use strict';
     geometry = new THREE.CylinderGeometry(r, r, h, 16);
-    var material = new THREE.MeshBasicMaterial({ color:color, wireframe:false });
+    // var material = new THREE.MeshBasicMaterial({ color:color, wireframe:false });
+    var material = new THREE.MeshLambertMaterial({ color:color, wireframe:false });
     mesh = new THREE.Mesh(geometry, material);
     if (rotation !== 0 && axis === 'z') {
         mesh.rotateZ(rotation);
@@ -419,19 +425,7 @@ function addSphere(obj, r, Vx, Vy, Vz, Sx, Sy, Sz, color) {
     obj.add(mesh);
 }
 
-//////////////////////
-/* CHECK COLLISIONS */
-//////////////////////
-function checkCollisions(){
-    'use strict';
-
-}
-
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions(){
-    'use strict';
+function createMeshes() {
 
 }
 
@@ -472,9 +466,11 @@ function init() {
 
     createScene();
     createCamera();
+    createLight();
     createGround();
     createSkydome();
-    createMoonAndLight();
+    createMeshes();
+    createMoon();
     createHouse();
     createOvni();
     createTrees();
