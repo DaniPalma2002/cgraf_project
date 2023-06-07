@@ -4,10 +4,13 @@
 var camera;
 var scene, renderer;
 var controls;
-var skydomeGeo, skydomeMat, skydome;
+var skydomeGeo, skydomeMat, skydome, moon, light;
 var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCockpit;
 
 var house, roof, chimney, doorAndWindows;
+
+var tree, tree2, tree3;
+var geometry, mesh;
 
 var speed = 10;
 var clock, delta;
@@ -333,6 +336,7 @@ function createOvniLights4(){
 }
 
 function createOvniBeam(){
+    'use strict';
     var ovniBeamGeo = new THREE.CylinderGeometry(25,25,50,32);
     var ovniBeamMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
     var ovniBeam = new THREE.Mesh(ovniBeamGeo,ovniBeamMaterial);
@@ -342,16 +346,78 @@ function createOvniBeam(){
 }
 
 function createOvni(){
-    createOvniBody();
+    'use strict';
+    createOvniBody(); 
     createOvniCockPit();
     createOvniLights1();
     createOvniLights2();
     createOvniLights3();
     createOvniLights4();
     createOvniBeam();
-
 }
 
+function createTree(Px, Py, Pz, Sx, Sy, Sz) {
+    'use strict';
+    let tree = new THREE.Object3D();
+    addCilinder(tree, 15, 20, 0, 0, 0, 0, "", 0x915100);
+    addCilinder(tree, 15, 70, -15, 32.5, 0, Math.PI/6, 'z', 0x915100);    
+    addSphere(tree, 50, -30, 75, 0, 1, 0.5, 0.5, 0x006400);
+    addCilinder(tree, 10, 45, 15, 25, 0, -Math.PI/4, 'z', 0x915100);
+    addSphere(tree, 30, 30, 45, 0, 1, 0.5, 0.5, 0x006400);
+    tree.position.x = Px;
+    tree.position.y = Py;
+    tree.position.z = Pz;
+    tree.scale.set(Sx, Sy, Sz);
+    return tree;
+}
+
+function createTrees() {
+    'use strict';
+    tree = createTree(-100, 0, -100, 1.5, 1.5, 1.5);
+    tree2 = createTree(-250, 0, -100, 1.2, 1.2, 1.2);
+    tree3 = createTree(450, 0, -100, 1.3, 1.3, 1.3);
+    scene.add(tree);
+    scene.add(tree2);
+    scene.add(tree3);
+}
+
+function createMoonAndLight() {
+    'use strict';
+    moon = new THREE.Object3D();
+    geometry = new THREE.SphereGeometry(50, 16);
+    var material = new THREE.MeshStandardMaterial({ color:0xF0C420, wireframe:false });
+    material.emissive.set(0xF0C420);
+    material.emissiveIntensity = 2.5;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(800, 800, 0);
+    moon.add(mesh);
+    light = new THREE.DirectionalLight(0xF0C420, 1);
+    light.position.set(mesh.position);
+    scene.add(moon);
+    scene.add(light);
+}
+
+function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
+    'use strict';
+    geometry = new THREE.CylinderGeometry(r, r, h, 16);
+    var material = new THREE.MeshBasicMaterial({ color:color, wireframe:false });
+    mesh = new THREE.Mesh(geometry, material);
+    if (rotation !== 0 && axis === 'z') {
+        mesh.rotateZ(rotation);
+    }
+    mesh.position.set(Vx, Vy, Vz);
+    obj.add(mesh);
+}
+
+function addSphere(obj, r, Vx, Vy, Vz, Sx, Sy, Sz, color) {
+    'use strict';
+    geometry = new THREE.SphereGeometry(r, 16);
+    geometry.scale(Sx, Sy, Sz);
+    var material = new THREE.MeshBasicMaterial({ color:color, wireframe:false });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(Vx, Vy, Vz);
+    obj.add(mesh);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -408,8 +474,10 @@ function init() {
     createCamera();
     createGround();
     createSkydome();
+    createMoonAndLight();
     createHouse();
     createOvni();
+    createTrees();
 
     clock = new THREE.Clock(true);
 
