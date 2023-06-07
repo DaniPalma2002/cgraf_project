@@ -57,24 +57,28 @@ function createLight() {
 ////////////////////////
 function createGround() {
     'use strict';
-    const groundGeo = new THREE.PlaneGeometry(1000, 1000, 250, 250);
+    const groundGeo = new THREE.PlaneGeometry(2000, 2000, 100, 100);
     let displayMat = new THREE.TextureLoader()
         .load('../images/heightmap.png');
-    
+
+    let texture = new THREE.TextureLoader()
+        .load('../images/heightmap.png');
+
     //displayMat.wrapS = displayMat.wrapT = THREE.RepeatWrapping;
     //displayMat.repeat.set(10, 10);
 
     const groundMat = new THREE.MeshStandardMaterial({
-        color: 0x000000,
-        wireframe: true,
+        //color: 0x00ff00,
+        wireframe: false,
         displacementMap: displayMat,
-        displacementScale: 40,
+        displacementScale: 80,
+        map: texture,
     });
 
     const ground = new THREE.Mesh(groundGeo, groundMat);
     scene.add(ground);
     ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -20;
+    ground.position.y = -40;
     ground.position.x = 100;
 }
 
@@ -295,47 +299,47 @@ function createOvniCockPit(){
 }
 
 
-function createOvniLights1(){ 
+function createOvniLights1(){
     'use strict';
     var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
     var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = -Math.PI / 4; 
-    var radius = 75; 
+    var angle = -Math.PI / 4;
+    var radius = 75;
     ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
     ovniBody.add(ovniLight);
 
 }
 
-function createOvniLights2(){ 
+function createOvniLights2(){
     'use strict';
     var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
     var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = Math.PI / 4; 
-    var radius = 75; 
+    var angle = Math.PI / 4;
+    var radius = 75;
     ovniLight.position.set(radius * Math.cos(angle), -100, radius * Math.sin(angle));
     ovniBody.add(ovniLight);
 }
 
-function createOvniLights3(){ 
+function createOvniLights3(){
     'use strict';
     var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
     var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = Math.PI / 4; 
-    var radius = 75; 
+    var angle = Math.PI / 4;
+    var radius = 75;
     ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
     ovniBody.add(ovniLight);
 }
 
-function createOvniLights4(){ 
+function createOvniLights4(){
     'use strict';
     var ovniLightGeo = new THREE.SphereGeometry(25, 8, 8);
     var ovniLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     var ovniLight = new THREE.Mesh(ovniLightGeo, ovniLightMat);
-    var angle = -Math.PI / 4; 
-    var radius = 75; 
+    var angle = -Math.PI / 4;
+    var radius = 75;
     ovniLight.position.set(-(radius * Math.cos(angle)), -100, radius * Math.sin(angle));
     ovniBody.add(ovniLight);
 }
@@ -352,7 +356,7 @@ function createOvniBeam(){
 
 function createOvni(){
     'use strict';
-    createOvniBody(); 
+    createOvniBody();
     createOvniCockPit();
     createOvniLights1();
     createOvniLights2();
@@ -365,7 +369,7 @@ function createTree(Px, Py, Pz, Sx, Sy, Sz) {
     'use strict';
     let tree = new THREE.Object3D();
     addCilinder(tree, 15, 20, 0, 0, 0, 0, "", 0x915100);
-    addCilinder(tree, 15, 70, -15, 32.5, 0, Math.PI/6, 'z', 0x915100);    
+    addCilinder(tree, 15, 70, -15, 32.5, 0, Math.PI/6, 'z', 0x915100);
     addSphere(tree, 50, -30, 75, 0, 1, 0.5, 0.5, 0x006400);
     addCilinder(tree, 10, 45, 15, 25, 0, -Math.PI/4, 'z', 0x915100);
     addSphere(tree, 30, 30, 45, 0, 1, 0.5, 0.5, 0x006400);
@@ -461,7 +465,7 @@ function init() {
     renderer.setAnimationLoop( function () {
 
         renderer.render( scene, camera );
-    
+
     } );
 
     createScene();
@@ -492,7 +496,7 @@ function animate() {
     delta = clock.getDelta()
     var newOvniVector = new THREE.Vector3();
     for (let [key, value] of ovniflags) {
-    if(value){ 
+    if(value){
         switch (key) {
             case "LEFT":
                 newOvniVector.x -= 2;
@@ -514,7 +518,7 @@ function animate() {
 ////////////////////////////
 /* RESIZE WINDOW CALLBACK */
 ////////////////////////////
-function onResize() { 
+function onResize() {
     'use strict';
 
 }
