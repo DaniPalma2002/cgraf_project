@@ -62,7 +62,7 @@ function createGround() {
         .load('../images/heightmap.png');
 
     let texture = new THREE.TextureLoader()
-        .load('../images/heightmap.png');
+        .load('../images/R.png');
 
     //displayMat.wrapS = displayMat.wrapT = THREE.RepeatWrapping;
     //displayMat.repeat.set(10, 10);
@@ -499,10 +499,10 @@ function animate() {
     if(value){
         switch (key) {
             case "LEFT":
-                newOvniVector.x -= 2;
+                newOvniVector.x -= speed * 15 * delta;
                 break;
             case "RIGHT":
-                newOvniVector.x += 2;
+                newOvniVector.x += speed * 15 * delta;
                 break;
             }
         }
