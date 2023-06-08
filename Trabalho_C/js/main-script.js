@@ -7,7 +7,7 @@ var controls;
 var skydomeGeo, skydomeMat, skydome, moon, light, ambientLight;
 var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCockpit;
 
-var house, roof, chimney, doorAndWindows;
+var house, roof, chimney, door, windows;
 
 var tree, tree2, tree3;
 var geometry, mesh;
@@ -123,10 +123,8 @@ function createGround() {
         .load('../images/heightmap.png');
 
     let texture = new THREE.TextureLoader()
-        .load('../images/R.png');
+        .load('../images/heightmap.png'); // TODO: change to grass texture
 
-    //displayMat.wrapS = displayMat.wrapT = THREE.RepeatWrapping;
-    //displayMat.repeat.set(10, 10);
 
     const groundMat = new THREE.MeshStandardMaterial({
         //color: 0x00ff00,
@@ -216,10 +214,12 @@ function createHouse() {
     var house = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
     addRoof();
     addChimney();
-    addDoorAndWindows();
+    addWindows();
+    addDoor();
     house.add(roof);
     house.add(chimney);
-    house.add(doorAndWindows);
+    house.add(door);
+    house.add(windows);
     scene.add(house);
 }
 
@@ -287,7 +287,7 @@ function addChimney() {
     chimney = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
 }
 
-function addDoorAndWindows() {
+function addWindows() {
     'use strict';
     var geometry = new THREE.BufferGeometry();
     var vertices = [
@@ -305,11 +305,6 @@ function addDoorAndWindows() {
         300, 30, 0,  // Vertex 9
         300, 70, 0,  // Vertex 10
         260, 70, 0,  // Vertex 11
-
-        80, 0, 0,  // Vertex 12
-        120, 0, 0,  // Vertex 13
-        120, 70, 0,  // Vertex 14
-        80, 70, 0,  // Vertex 15
     ];
     var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
     geometry.setAttribute('position', positionAttribute);
@@ -317,17 +312,33 @@ function addDoorAndWindows() {
         1, 2, 0,  0, 2, 3,   // Face 0
         4, 5, 6,  4, 6, 7,   // Face 1
         8, 9, 10,  8, 10, 11,   // Face 2
-        12, 13, 14,  12, 14, 15,   // Face 3
-        /*0, 4, 1,  1, 4, 5,   // Face 2
-        1, 5, 2,  2, 5, 6,   // Face 3
-        2, 6, 3,  3, 6, 7,   // Face 4
-        3, 7, 0,  0, 7, 4    // Face 5 */
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
     geometry.computeVertexNormals();
     // var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
-    doorAndWindows = new THREE.Mesh(geometry, materials.get("BROWN")[0]);
+    windows = new THREE.Mesh(geometry, materials.get("BLUE")[0]);
+}
+
+function addDoor() {
+    'use strict';
+    var geometry = new THREE.BufferGeometry();
+    var vertices = [
+        80, 0, 0,  // Vertex 0
+        120, 0, 0,  // Vertex 1
+        120, 70, 0,  // Vertex 2
+        80, 70, 0,  // Vertex 3
+    ];
+    var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
+    geometry.setAttribute('position', positionAttribute);
+    var indices = [
+        0, 1, 2, 2, 3, 0     // Face 0
+    ];
+    var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
+    geometry.setIndex(indexAttribute);
+    geometry.computeVertexNormals();
+    // var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
+    door = new THREE.Mesh(geometry, materials.get("BROWN")[0]);
 }
 
 function createSkydome() {
