@@ -1,12 +1,13 @@
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-var camera;
-var scene, renderer;
+var currentCamera, camera, textureCamera;
+var currentScene, scene, groundScene, skyScene;
+var currentRenderer, renderer, groundRenderer, skyRenderer;
 var controls;
 var skydomeGeo, skydomeMat, skydome, moon, light, ambientLight, spotlight, pointLights = [];
 var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCockpit;
-
+var ground;
 var house, roof, chimney, door, windows;
 
 var tree, tree2, tree3, tree4, tree5, tree6, tree7, tree8, tree9;
@@ -36,27 +37,35 @@ var projectMeshes = new Map([]);
 var materials = new Map([])
 let ovni = new THREE.Object3D();
 
+var generateGroundTexture = false;
+var generateSkyTexture = false;
 
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
-function createScene(){
+function createScene() {
     'use strict';
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xF8F8F8);
-    scene.add(new THREE.AxesHelper(100));
+
+    groundScene = new THREE.Scene();
+    skyScene = new THREE.Scene();
+    currentScene = scene;
 }
 
 //////////////////////
 /* CREATE CAMERA(S) */
 //////////////////////
 function createCamera() {
-    /* camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
-        window.innerHeight / 2, -window.innerHeight / 2, 1, 10000); */
     camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.set(1000, 2000, 4000);
     camera.lookAt(scene.position);
     camera.updateProjectionMatrix();
+
+    textureCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    textureCamera.position.z = 5;
+
+    currentCamera = camera;
 }
 
 /////////////////////
@@ -155,6 +164,96 @@ function createMaterials() {
     createOvniMaterials();
 }
 
+/////////////////////
+/* CREATE TEXTURE(S) */
+/////////////////////
+function createTextures() {
+    'use strict';
+
+    var geometry = new THREE.BufferGeometry();
+    var material = new THREE.PointsMaterial({ size: 0.03, vertexColors: true });
+
+    if (generateGroundTexture) {
+
+        var colors = [0xffffff, 0xffff00, 0x9370db, 0xadd8e6]; 
+        var fieldRadius = 8;
+        var fieldDensity = 3200;
+        var positions = [];
+        var colorsData = [];
+
+        for (var i = 0; i < fieldDensity; i++) {
+            var x = Math.random() * fieldRadius * 3 - fieldRadius;
+            var y = Math.random() * fieldRadius * 3 - fieldRadius;
+            var z = 0;
+
+            positions.push(x, y, z);
+
+            var color = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+            colorsData.push(color.r, color.g, color.b);
+        }
+
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colorsData, 3));
+
+        groundScene.background = new THREE.Color(0x17ad00);         
+        var points = new THREE.Points(geometry, material);
+        groundScene.add(points);
+    } else if (generateSkyTexture) {
+
+        var skyRadius = 8;
+        var skyDensity = 1000;
+        var positions = [];
+        var colorsData = [];
+
+        for (var i = 0; i < skyDensity; i++) {
+            var x = Math.random() * skyRadius * 3 - skyRadius;
+            var y = Math.random() * skyRadius * 3 - skyRadius;
+            var z = 0;
+
+            positions.push(x, y, z);
+
+            var color = new THREE.Color(0xffffff); 
+            colorsData.push(color.r, color.g, color.b);
+        }
+
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colorsData, 3));
+
+        var gradientTexture = new THREE.Texture(generateGradientCanvas());
+        gradientTexture.needsUpdate = true;
+        skyScene.background = gradientTexture;
+        var points = new THREE.Points(geometry, material);
+        skyScene.add(points);
+    }
+}
+
+function generateGradientCanvas() {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+
+    canvas.width = 256;
+    canvas.height = 256;
+
+    var gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#00008B'); 
+    gradient.addColorStop(1, '#8A2BE2'); 
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    return canvas;
+}
+
+function saveTexture(name) {
+    let element = document.createElement("a");
+    document.body.appendChild(element);
+    element.download = name + ".png";
+    element.href = renderer.domElement.toDataURL("image/png");
+    element.click();
+    document.body.removeChild(element);
+}
+
+
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
@@ -163,9 +262,11 @@ function createGround() {
     let groundGeo = new THREE.PlaneGeometry(3200, 3200, 100, 100);
     let displayMat = new THREE.TextureLoader().load('../images/heightmap.png');
     let texture = new THREE.TextureLoader().load('../images/Ground.png');
-    let groundMat = new THREE.MeshPhongMaterial({displacementMap: displayMat, displacementScale: 80, map: texture});
+    let groundMat = new THREE.MeshPhongMaterial({
+        displacementMap: displayMat, displacementScale: 80, map: texture
+    });
 
-    let ground = new THREE.Mesh(groundGeo, groundMat);
+    ground = new THREE.Mesh(groundGeo, groundMat);
     scene.add(ground);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -40;
@@ -251,8 +352,7 @@ function createHouse() {
         17, 30, 25, 25, 18, 17, // Face 0.6
         0, 20, 28, 28, 27, 0,    // Face 0.7
         21, 1, 30, 30, 29, 21,   // Face 0.8
-
-        4, 6, 5, 4, 7, 6,   // Face 1
+        4, 6, 5, 4, 7, 6,       // Face 1
         35, 41, 36, 36, 41, 42,   // Face 3
         40, 39, 37, 37, 39, 38    // Face 4
     ];
@@ -272,7 +372,7 @@ function createHouse() {
     house.add(door);
     house.add(windows);
     scene.add(house);
-    house.position.set(0, 0, 0);
+    house.position.set(-50, 0, -50);
     house.rotation.y = Math.PI/4;
 }
 
@@ -351,7 +451,6 @@ function addWindows() {
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
     geometry.computeVertexNormals();
-    // var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
     windows = new THREE.Mesh(geometry, materials.get("BLUE")[0]);
     let meshList = projectMeshes.get("BLUE");
     meshList.push(windows);
@@ -375,7 +474,6 @@ function addDoor() {
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
     geometry.computeVertexNormals();
-    // var material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
     door = new THREE.Mesh(geometry, materials.get("BROWN")[0]);
     let meshList = projectMeshes.get("BROWN");
     meshList.push(door);
@@ -385,7 +483,6 @@ function addDoor() {
 function addOvniBody(obj,r,d,t) {
     geometry = new THREE.SphereGeometry(r,d,t);
     geometry.scale(1.5, 0.5, 1.5);
-    // material = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
     mesh = new THREE.Mesh(geometry, materials.get("DARK-GRAY")[0]);
     let meshList = projectMeshes.get("DARK-GRAY");
     meshList.push(mesh);
@@ -398,7 +495,6 @@ function addOvniCockPit(obj,r,d,t,a,s) {
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,t,a,s);
     geometry.rotateX(-Math.PI/2);
-    // material = new THREE.MeshBasicMaterial({ color: 0xADD8E6 });
     mesh = new THREE.Mesh(geometry, materials.get("BLUE")[0]);
     mesh.position.y = 35;
     let meshList = projectMeshes.get("BLUE");
@@ -410,7 +506,6 @@ function addOvniCockPit(obj,r,d,t,a,s) {
 function addOvniLights1(obj,r,d,radius,angle) { 
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,d);
-    // material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     mesh = new THREE.Mesh(geometry, materials.get("YELLOW")[0]); 
     mesh.position.set(radius * Math.cos(angle)*10, -60, radius * Math.sin(angle)*10);    
     let meshList = projectMeshes.get("YELLOW");
@@ -425,7 +520,6 @@ function addOvniLights1(obj,r,d,radius,angle) {
 function addOvniLights2(obj,r,d,radius,angle) { 
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,d);
-    // material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     mesh = new THREE.Mesh(geometry, materials.get("YELLOW")[0]); 
     mesh.position.set(-(radius * Math.cos(angle))*10, -60, radius * Math.sin(angle)*10);
     let meshList = projectMeshes.get("YELLOW");
@@ -440,7 +534,6 @@ function addOvniLights2(obj,r,d,radius,angle) {
 function addOvniBeam(obj,r,d,h,t,y) {
     'use strict';
     geometry= new THREE.CylinderGeometry(r,d,h,t);
-    // material = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
     mesh= new THREE.Mesh(geometry, materials.get("BLUE")[0]);
     mesh.position.y = y;
     let meshList = projectMeshes.get("BLUE");
@@ -462,7 +555,7 @@ function createOvni() {
     addOvniLights2(ovni,25, 8, 8,-150,-Math.PI / 4);
     addOvniBeam(ovni,25,25,50,32,-50);
     scene.add(ovni);
-    ovni.position.set(150,500,-100);
+    ovni.position.set(0,500,-220);
 }
 
 function createTree(Px, Py, Pz, Sx, Sy, Sz, Ry) {
@@ -497,7 +590,6 @@ function createMoon() {
     'use strict';
     moon = new THREE.Object3D();
     geometry = new THREE.SphereGeometry(50, 16);
-    // var material = new THREE.MeshStandardMaterial({ color:0xF0C420 });
     mesh = new THREE.Mesh(geometry, materials.get("MOON")[0]);
     mesh.position.set(800, 800, 0);
     let meshList = projectMeshes.get("MOON");
@@ -510,8 +602,6 @@ function createMoon() {
 function addCilinder(obj, r, h, Vx, Vy, Vz, rotation, axis, color) {
     'use strict';
     geometry = new THREE.CylinderGeometry(r, r, h, 16);
-    // var material = new THREE.MeshBasicMaterial({ color:color, wireframe:false });
-    // var material = new THREE.MeshLambertMaterial({ color:color, wireframe:false })
     var material;
     if (color === 0x915100) {
         material = materials.get("BROWN")[0];
@@ -568,6 +658,18 @@ function update() {
     for (let i = 0; i < pointLights.length; i++) {
         pointLights[i].intensity = intensity;
     }
+    if (generateGroundTexture) {
+        groundScene.remove(groundScene.children[0]);
+        createTextures();
+        let texture = new THREE.CanvasTexture(groundRenderer.domElement, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping);
+        ground.material.map = texture;
+    } else if (generateSkyTexture) {
+        skyScene.remove(skyScene.children[0]);
+        createTextures();
+        let texture = new THREE.CanvasTexture(skyRenderer.domElement, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping);
+        texture.repeat.set(2,2);
+        skydome.material.map = texture;
+    }
 }
 
 /////////////
@@ -575,7 +677,7 @@ function update() {
 /////////////
 function render() {
     'use strict';
-    renderer.render(scene, camera);
+    currentRenderer.render(currentScene, currentCamera);
 }
 
 ////////////////////////////////
@@ -586,17 +688,22 @@ function init() {
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
+    currentRenderer = renderer;
+
     renderer.xr.enabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     document.body.appendChild( VRButton.createButton( renderer ) );
-
+    
     renderer.setAnimationLoop( function () {
-
         renderer.render( scene, camera );
-
+        
     } );
-
+    
+    groundRenderer = new THREE.WebGLRenderer({ antialias: true });
+    groundRenderer.setSize(window.innerWidth, window.innerHeight);
+    skyRenderer = new THREE.WebGLRenderer({ antialias: true });
+    skyRenderer.setSize(window.innerWidth, window.innerHeight);
     createScene();
     createCamera();
     createLight();
@@ -660,11 +767,25 @@ function animate() {
         }
         index++;
     }
+
     update();
+    if (generateGroundTexture) {
+        generateGroundTexture = false;
+        currentScene = groundScene;
+        currentCamera = textureCamera;
+        currentRenderer = groundRenderer;
+    } else if (generateSkyTexture) {
+        generateSkyTexture = false;
+        currentScene = skyScene;
+        currentCamera = textureCamera;
+        currentRenderer = skyRenderer;
+    } else {
+        currentScene = scene;
+        currentCamera = camera;
+    }
     render();
     controls.update();
     requestAnimationFrame(animate);
-
 }
 
 ////////////////////////////
@@ -672,7 +793,12 @@ function animate() {
 ////////////////////////////
 function onResize() {
     'use strict';
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
@@ -710,6 +836,12 @@ function onKeyDown(e) {
             break;
         case 83:
             ovniBeamState = !ovniBeamState;
+            break;
+        case 49:
+            generateGroundTexture = true;
+            break;
+        case 50:
+            generateSkyTexture = true;
             break;
     }
 }
