@@ -161,8 +161,8 @@ function createMaterials() {
 function createGround() {
     'use strict';
     let groundGeo = new THREE.PlaneGeometry(3200, 3200, 100, 100);
-    let displayMat = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116593508367732736/heightmap.png');
-    let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597726503780433/Ground2.jpeg'); // TODO: change to grass texture
+    let displayMat = new THREE.TextureLoader().load('../images/heightmap.png');
+    let texture = new THREE.TextureLoader().load('../images/Ground.png');
     let groundMat = new THREE.MeshPhongMaterial({displacementMap: displayMat, displacementScale: 80, map: texture});
 
     let ground = new THREE.Mesh(groundGeo, groundMat);
@@ -175,7 +175,7 @@ function createGround() {
 function createSkydome() {
     'use strict';
     skydomeGeo = new THREE.SphereGeometry(1500, 32, 32);
-    let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597956733317190/Sky.jpeg');
+    let texture = new THREE.TextureLoader().load('../images/Sky.png');
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(2,2);
@@ -483,7 +483,7 @@ function createTrees() {
     'use strict';
     tree = createTree(-1000, 0, -100, 1.5, 1.5, 1.5, Math.PI/2);
     tree2 = createTree(-800, 0, -800, 1.2, 2, 2, -Math.PI/4);
-    tree3 = createTree(-600, 40, 100, 2, 1.3, 2, Math.PI/4);
+    tree3 = createTree(-600, 40, 100, 1.8, 1.3, 1.8, Math.PI/4);
     tree4 = createTree(-400, 0, 600, 1.3, 1.7, 1.3, Math.PI/4);
     tree5 = createTree(-200, 0, -500, 1.8, 1.3, 1.3, -Math.PI/4);
     tree6 = createTree(400, 0, -600, 1.3, 1.8, 1.8, -Math.PI/2);
