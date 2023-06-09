@@ -174,7 +174,7 @@ function createSkydome() {
     'use strict';
     skydomeGeo = new THREE.SphereGeometry(1500, 32, 32);
     let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597956733317190/Sky.jpeg');
-    skydomeMat = new THREE.MeshBasicMaterial({side: THREE.BackSide, map:texture});
+    skydomeMat = new THREE.MeshPhongMaterial({side: THREE.BackSide, map:texture});
     skydome = new THREE.Mesh(skydomeGeo, skydomeMat);
     scene.add(skydome);
 }
@@ -456,7 +456,7 @@ function addOvniBeam(obj,r,d,h,t,y){
     let meshList = projectMeshes.get("BLUE");
     meshList.push(mesh);
     projectMeshes.set("BLUE", meshList);
-    spotlight = new THREE.SpotLight(0xFFFFFF, 1, 0, Math.PI/10, 1);
+    spotlight = new THREE.SpotLight(0xFFFFFF, 1, 700, Math.PI/10, 0.5, 0.5);
     obj.add(spotlight);
     obj.add(spotlight.target);
     obj.add(mesh);
