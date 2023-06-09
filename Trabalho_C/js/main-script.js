@@ -481,15 +481,15 @@ function createTree(Px, Py, Pz, Sx, Sy, Sz, Ry) {
 
 function createTrees() {
     'use strict';
-    tree = createTree(-100, 0, -100, 1.5, 1.5, 1.5, Math.PI/4);
-    tree2 = createTree(-250, 0, -100, 1.2, 1.2, 1.2, Math.PI/4);
-    tree3 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
-    tree4 = createTree(550, 0, 200, 1.3, 1.3, 1.3, Math.PI/4);
-    tree5 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
-    tree6 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
-    tree7 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
-    tree8 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
-    tree9 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree = createTree(-1000, 0, -100, 1.5, 1.5, 1.5, Math.PI/2);
+    tree2 = createTree(-800, 0, -800, 1.2, 2, 2, -Math.PI/4);
+    tree3 = createTree(-600, 40, 100, 2, 1.3, 2, Math.PI/4);
+    tree4 = createTree(-400, 0, 600, 1.3, 1.7, 1.3, Math.PI/4);
+    tree5 = createTree(-200, 0, -500, 1.8, 1.3, 1.3, -Math.PI/4);
+    tree6 = createTree(400, 0, -600, 1.3, 1.8, 1.8, -Math.PI/2);
+    tree7 = createTree(600, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree8 = createTree(800, 0, 700, 1.3, 1.7, 1.3, -Math.PI/2);
+    tree9 = createTree(1000, 0, -300, 1.3, 2, 1.3, Math.PI/4);
     scene.add(tree, tree2, tree3, tree4, tree5, tree6, tree7, tree8, tree9);
 }
 
