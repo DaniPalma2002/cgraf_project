@@ -4,7 +4,7 @@
 var camera;
 var scene, renderer;
 var controls;
-var skydomeGeo, skydomeMat, skydome, moon, light, ambientLight, spotlight;
+var skydomeGeo, skydomeMat, skydome, moon, light, ambientLight, spotlight, pointLights = [];
 var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCockpit;
 
 var house, roof, chimney, door, windows;
@@ -14,6 +14,8 @@ var geometry, mesh;
 
 var speed = 10;
 var clock, delta;
+
+var ovniBeamState = true, ovniLights = true;
 
 var ovniflags = new Map([
     ["LEFT", false],
@@ -435,8 +437,10 @@ function addOvniLights1(obj,r,d,radius,angle){
     let meshList = projectMeshes.get("YELLOW");
     meshList.push(mesh);
     projectMeshes.set("YELLOW", meshList);
+    let pointLight = new THREE.PointLight(0xFFFFFF, 0.2, 700, 1);
+    mesh.add(pointLight);
+    pointLights.push(pointLight);
     obj.add(mesh);
-
 }
 
 function addOvniLights2(obj,r,d,radius,angle){ 
@@ -448,6 +452,9 @@ function addOvniLights2(obj,r,d,radius,angle){
     let meshList = projectMeshes.get("YELLOW");
     meshList.push(mesh);
     projectMeshes.set("YELLOW", meshList);
+    let pointLight = new THREE.PointLight(0xFFFFFF, 0.2, 700, 1);
+    mesh.add(pointLight);
+    pointLights.push(pointLight);
     obj.add(mesh);
 }
 
@@ -463,8 +470,8 @@ function addOvniBeam(obj,r,d,h,t,y){
     meshList.push(mesh);
     projectMeshes.set("BLUE", meshList);
     spotlight = new THREE.SpotLight(0xFFFFFF, 1, 700, Math.PI/10, 0.5, 0.5);
-    obj.add(spotlight);
-    obj.add(spotlight.target);
+    mesh.add(spotlight);
+    mesh.add(spotlight.target);
     obj.add(mesh);
 }
 
@@ -573,7 +580,16 @@ function addSphere(obj, r, Vx, Vy, Vz, Sx, Sy, Sz, color) {
 ////////////
 function update(){
     'use strict';
-
+    if (ovniBeamState)
+        spotlight.intensity = 1;
+    else
+        spotlight.intensity = 0;
+    let intensity = 0;
+    if (ovniLights)
+        intensity = 0.2;
+    for (let i = 0; i < pointLights.length; i++) {
+        pointLights[i].intensity = intensity;
+    }
 }
 
 /////////////
@@ -658,6 +674,7 @@ function animate() {
         }
         index++;
     }
+    update();
     render();
     controls.update();
     requestAnimationFrame(animate);
@@ -693,8 +710,14 @@ function onKeyDown(e) {
         case 69:
             materialFlags.set("TOON", true);
             break;
+        case 80:
+            ovniLights = !ovniLights;
+            break;
         case 82:
             materialFlags.set("BASIC", true);
+            break;
+        case 83:
+            ovniBeamState = !ovniBeamState;
             break;
     }
 }
@@ -705,7 +728,7 @@ function onKeyDown(e) {
 function onKeyUp(e){
     'use strict';
     switch (e.keyCode) {
-        case 37: // Arrow Left
+        case 37:
             ovniflags.set("LEFT", false);
             break;
         case 39:
