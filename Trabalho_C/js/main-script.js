@@ -9,7 +9,7 @@ var ovniBodyGeo, ovniBodyMat, ovniBody, ovniCockpitGeo, ovniCockpitMat, ovniCock
 
 var house, roof, chimney, door, windows;
 
-var tree, tree2, tree3;
+var tree, tree2, tree3, tree4, tree5, tree6, tree7, tree8, tree9;
 var geometry, mesh;
 
 var speed = 10;
@@ -42,7 +42,7 @@ function createScene(){
     'use strict';
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xF8F8F8);
-    scene.add(new THREE.AxesHelper(1000));
+    scene.add(new THREE.AxesHelper(100));
 }
 
 //////////////////////
@@ -50,10 +50,11 @@ function createScene(){
 //////////////////////
 function createCamera() {
     camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
-        window.innerHeight / 2, -window.innerHeight / 2, 1, 1000);
-    camera.far = 10000;
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 10000);
+    //camera.far = 100000;
+    //camera.near = .1;
     camera.updateProjectionMatrix();
-    camera.position.set(200, 200, 200);
+    camera.position.set(5000, 5000, 5000);
     camera.lookAt(scene.position);
 }
 
@@ -159,20 +160,15 @@ function createMaterials() {
 function createGround() {
     'use strict';
     let groundGeo = new THREE.PlaneGeometry(3200, 3200, 100, 100);
-    // let displayMat = new THREE.TextureLoader().load('heightmap.png', null, null, onError);
-    // let texture = new THREE.TextureLoader().load('Ground.jpeg'); // TODO: change to grass texture
     let displayMat = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116593508367732736/heightmap.png');
     let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597726503780433/Ground2.jpeg'); // TODO: change to grass texture
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(2,2);
     let groundMat = new THREE.MeshPhongMaterial({displacementMap: displayMat, displacementScale: 80, map: texture});
 
     let ground = new THREE.Mesh(groundGeo, groundMat);
     scene.add(ground);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -40;
-    ground.position.x = 100;
+    ground.position.x = 0;
 }
 
 function createSkydome() {
@@ -233,6 +229,14 @@ function createHouse() {
         330, 30, -130,  // Vertex 32
         330, 70, -130,  // Vertex 33
         330, 70, -90,  // Vertex 34
+        /* duplicate vertex */
+        330, 0, 0,  // Vertex 35
+        330,  100, 0,  // Vertex 36
+        0, 0, 0,  // Vertex 37
+        0, 0, -230,  // Vertex 38
+        0,  100, -230,   // Vertex 39
+        0,  100, 0,  // Vertex 40
+
 
     ];
     var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
@@ -248,15 +252,12 @@ function createHouse() {
         21, 1, 30, 30, 29, 21,   // Face 0.8
 
         4, 6, 5,  4, 7, 6,   // Face 1
-        0, 4, 1,  1, 4, 5,   // Face 2
-        1, 5, 2,  2, 5, 6,   // Face 3
-
-        3, 7, 0,  0, 7, 4    // Face 5
+        35, 5, 36,  36, 5, 6,   // Face 3
+        40, 39, 37,  37, 39, 38    // Face 5
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
     geometry.computeVertexNormals();
-    // var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false  });
     var house = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
     let meshList = projectMeshes.get("GRAY");
     meshList.push(house);
@@ -270,6 +271,8 @@ function createHouse() {
     house.add(door);
     house.add(windows);
     scene.add(house);
+    house.position.set(0, 0, 0);
+    house.rotation.y = Math.PI/2;
 }
 
 function addRoof() {
@@ -282,27 +285,26 @@ function addRoof() {
         0,  160, -115,  // Vertex 3
         0, 100,  -230,  // Vertex 4
         330, 100,  -230,  // Vertex 5
-        170, 115.6, -30,  // Vertex 6
-        250, 115.6, -30,  // Vertex 7
-        170, 100, 0,  // Vertex 8
-        250, 100, 0,  // Vertex 9
-        0, 115.6, -30,  // Vertex 10
-        330, 115.6, -30,  // Vertex 11
+        330,  160, -115,  // Vertex 6
+        0,  160, -115,  // Vertex 7
+        0, 100, 0,  // Vertex 8
+        330, 100, 0,  // Vertex 9
+        0, 160, -115,  // Vertex 10
+        0, 100, -230,  // Vertex 11
+        330,  160, -115,  // Vertex 12
+        330, 100, -230,  // Vertex 13
     ];
     var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
     geometry.setAttribute('position', positionAttribute);
     var indices = [
-        0, 8, 6, 6, 10, 0,   // Face 0.1
-        9, 1, 11, 11, 7, 9,   // Face 0.2
-        10, 11, 2, 2, 3, 10,   // Face 0.3
-        2, 5, 3,  3, 5, 4,   // Face 1
-        0, 3, 4,             // Face 2
-        1, 5, 2,             // Face 3
+        0, 1, 2, 2, 3, 0,   // Face 0
+        6, 5, 7, 7, 5, 4,   // Face 1
+        8, 10, 11,          // Face 2
+        9, 13, 12,          // Face 3
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
     geometry.computeVertexNormals();
-    // var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: false });
     roof = new THREE.Mesh(geometry, materials.get("ORANGE")[0]);
     let meshList = projectMeshes.get("ORANGE");
     meshList.push(roof);
@@ -311,32 +313,9 @@ function addRoof() {
 
 function addChimney() {
     'use strict';
-    var geometry = new THREE.BufferGeometry();
-    var vertices = [
-        170, 100, 0,  // Vertex 0
-        250, 100, 0,  // Vertex 1
-        250, 180, 0,  // Vertex 2
-        170, 180, 0,  // Vertex 3
-        170, 115.6, -30,  // Vertex 4
-        250, 115.6, -30,  // Vertex 5
-        250, 180, -30,  // Vertex 6
-        170, 180, -30,   // Vertex 7
-    ];
-    var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
-    geometry.setAttribute('position', positionAttribute);
-    var indices = [
-        1, 2, 0,  0, 2, 3,   // Face 0
-        4, 6, 5,  4, 7, 6,   // Face 1
-        //0, 4, 1,  1, 4, 5,   // Face 2
-        1, 5, 2,  2, 5, 6,   // Face 3
-        2, 6, 3,  3, 6, 7,   // Face 4
-        3, 7, 0,  0, 7, 4    // Face 5
-    ];
-    var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
-    geometry.setIndex(indexAttribute);
-    geometry.computeVertexNormals();
-    // var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: false });
+    var geometry = new THREE.BoxGeometry(80, 80, 30);
     chimney = new THREE.Mesh(geometry, materials.get("GRAY")[0]);
+    chimney.position.set(210, 140, -15);
     let meshList = projectMeshes.get("GRAY");
     meshList.push(chimney);
     projectMeshes.set("GRAY", meshList);
@@ -488,7 +467,7 @@ function createOvni(){
     ovni.position.set(150,500,-100);
 }
 
-function createTree(Px, Py, Pz, Sx, Sy, Sz) {
+function createTree(Px, Py, Pz, Sx, Sy, Sz, Ry) {
     'use strict';
     let tree = new THREE.Object3D();
     addCilinder(tree, 15, 20, 0, 0, 0, 0, "", 0x915100);
@@ -496,23 +475,24 @@ function createTree(Px, Py, Pz, Sx, Sy, Sz) {
     addSphere(tree, 50, -30, 75, 0, 1, 0.5, 0.5, 0x006400);
     addCilinder(tree, 10, 45, 15, 25, 0, -Math.PI/4, 'z', 0x915100);
     addSphere(tree, 30, 30, 45, 0, 1, 0.5, 0.5, 0x006400);
-    tree.position.x = Px;
-    tree.position.y = Py;
-    tree.position.z = Pz;
+    tree.position.set(Px, Py, Pz);
     tree.scale.set(Sx, Sy, Sz);
+    tree.rotateY(Ry);
     return tree;
 }
 
 function createTrees() {
     'use strict';
-    tree = createTree(-100, 0, -100, 1.5, 1.5, 1.5);
-    tree2 = createTree(-250, 0, -100, 1.2, 1.2, 1.2);
-    tree3 = createTree(450, 0, -100, 1.3, 1.3, 1.3);
-    tree3.rotateY(Math.PI/4);
-    tree2.rotateY(-Math.PI/4);
-    scene.add(tree);
-    scene.add(tree2);
-    scene.add(tree3);
+    tree = createTree(-100, 0, -100, 1.5, 1.5, 1.5, Math.PI/4);
+    tree2 = createTree(-250, 0, -100, 1.2, 1.2, 1.2, Math.PI/4);
+    tree3 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree4 = createTree(550, 0, 200, 1.3, 1.3, 1.3, Math.PI/4);
+    tree5 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree6 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree7 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree8 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    tree9 = createTree(450, 0, -100, 1.3, 1.3, 1.3, Math.PI/4);
+    scene.add(tree, tree2, tree3, tree4, tree5, tree6, tree7, tree8, tree9);
 }
 
 function createMoon() {
