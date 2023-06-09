@@ -156,11 +156,14 @@ function createMaterials() {
 ////////////////////////
 function createGround() {
     'use strict';
-    let groundGeo = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+    let groundGeo = new THREE.PlaneGeometry(3200, 3200, 100, 100);
     // let displayMat = new THREE.TextureLoader().load('heightmap.png', null, null, onError);
     // let texture = new THREE.TextureLoader().load('Ground.jpeg'); // TODO: change to grass texture
     let displayMat = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116593508367732736/heightmap.png');
     let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597726503780433/Ground2.jpeg'); // TODO: change to grass texture
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(2,2);
     let groundMat = new THREE.MeshPhongMaterial({displacementMap: displayMat, displacementScale: 80, map: texture});
 
     let ground = new THREE.Mesh(groundGeo, groundMat);
@@ -174,6 +177,9 @@ function createSkydome() {
     'use strict';
     skydomeGeo = new THREE.SphereGeometry(1500, 32, 32);
     let texture = new THREE.TextureLoader().load('https://cdn.discordapp.com/attachments/545262082778464256/1116597956733317190/Sky.jpeg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(2,2);
     skydomeMat = new THREE.MeshPhongMaterial({side: THREE.BackSide, map:texture});
     skydome = new THREE.Mesh(skydomeGeo, skydomeMat);
     scene.add(skydome);
