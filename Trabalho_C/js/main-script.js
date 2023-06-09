@@ -501,6 +501,8 @@ function createTrees() {
     tree = createTree(-100, 0, -100, 1.5, 1.5, 1.5);
     tree2 = createTree(-250, 0, -100, 1.2, 1.2, 1.2);
     tree3 = createTree(450, 0, -100, 1.3, 1.3, 1.3);
+    tree3.rotateY(Math.PI/4);
+    tree2.rotateY(-Math.PI/4);
     scene.add(tree);
     scene.add(tree2);
     scene.add(tree3);
