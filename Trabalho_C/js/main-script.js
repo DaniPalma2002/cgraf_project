@@ -12,7 +12,7 @@ var house, roof, chimney, door, windows;
 var tree, tree2, tree3, tree4, tree5, tree6, tree7, tree8, tree9;
 var geometry, mesh;
 
-var speed = 10;
+var speed = 20;
 var clock, delta;
 
 var ovniBeamState = true, ovniLights = true;
@@ -20,6 +20,8 @@ var ovniBeamState = true, ovniLights = true;
 var ovniflags = new Map([
     ["LEFT", false],
     ["RIGHT", false],
+    ["UP", false],
+    ["DOWN", false]
 ])
 
 var materialFlags = new Map([
@@ -49,13 +51,12 @@ function createScene(){
 /* CREATE CAMERA(S) */
 //////////////////////
 function createCamera() {
-    camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
-        window.innerHeight / 2, -window.innerHeight / 2, 1, 10000);
-    //camera.far = 100000;
-    //camera.near = .1;
-    camera.updateProjectionMatrix();
-    camera.position.set(5000, 5000, 5000);
+    /* camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2, 1, 10000); */
+    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100000);
+    camera.position.set(1000, 2000, 4000);
     camera.lookAt(scene.position);
+    camera.updateProjectionMatrix();
 }
 
 /////////////////////
@@ -189,12 +190,12 @@ function createHouse() {
     var vertices = [
         0, 0, 0,  // Vertex 0
         330, 0, 0,  // Vertex 1
-        330,  100, 0,  // Vertex 2
-        0,  100, 0,  // Vertex 3
-        0, 0,  -230,  // Vertex 4
-        330, 0,  -230,  // Vertex 5
-        330,  100,  -230,  // Vertex 6
-        0,  100,  -230,   // Vertex 7
+        330, 100, 0,  // Vertex 2
+        0, 100, 0,  // Vertex 3
+        0, 0, -230,  // Vertex 4
+        330, 0, -230,  // Vertex 5
+        330,  100, -230,  // Vertex 6
+        0,  100, -230,   // Vertex 7
         /* door and windows vertices */
         /* window 1 */
         10, 30, 0,  // Vertex 8
@@ -234,10 +235,10 @@ function createHouse() {
         330,  100, 0,  // Vertex 36
         0, 0, 0,  // Vertex 37
         0, 0, -230,  // Vertex 38
-        0,  100, -230,   // Vertex 39
-        0,  100, 0,  // Vertex 40
-
-
+        0, 100, -230,   // Vertex 39
+        0, 100, 0,  // Vertex 40
+        330, 0, -230,  // Vertex 41
+        330, 100, -230,  // Vertex 42
     ];
     var positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
     geometry.setAttribute('position', positionAttribute);
@@ -251,9 +252,9 @@ function createHouse() {
         0, 20, 28, 28, 27, 0,    // Face 0.7
         21, 1, 30, 30, 29, 21,   // Face 0.8
 
-        4, 6, 5,  4, 7, 6,   // Face 1
-        35, 5, 36,  36, 5, 6,   // Face 3
-        40, 39, 37,  37, 39, 38    // Face 5
+        4, 6, 5, 4, 7, 6,   // Face 1
+        35, 41, 36, 36, 41, 42,   // Face 3
+        40, 39, 37, 37, 39, 38    // Face 4
     ];
     var indexAttribute = new THREE.Uint16BufferAttribute(indices, 1);
     geometry.setIndex(indexAttribute);
@@ -272,7 +273,7 @@ function createHouse() {
     house.add(windows);
     scene.add(house);
     house.position.set(0, 0, 0);
-    house.rotation.y = Math.PI/2;
+    house.rotation.y = Math.PI/4;
 }
 
 function addRoof() {
@@ -381,7 +382,7 @@ function addDoor() {
     projectMeshes.set("BROWN", meshList);
 }
 
-function addOvniBody(obj,r,d,t){
+function addOvniBody(obj,r,d,t) {
     geometry = new THREE.SphereGeometry(r,d,t);
     geometry.scale(1.5, 0.5, 1.5);
     // material = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
@@ -393,7 +394,7 @@ function addOvniBody(obj,r,d,t){
 
 }
 
-function addOvniCockPit(obj,r,d,t,a,s){
+function addOvniCockPit(obj,r,d,t,a,s) {
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,t,a,s);
     geometry.rotateX(-Math.PI/2);
@@ -406,8 +407,7 @@ function addOvniCockPit(obj,r,d,t,a,s){
     obj.add(mesh);
 }
 
-
-function addOvniLights1(obj,r,d,radius,angle){ 
+function addOvniLights1(obj,r,d,radius,angle) { 
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,d);
     // material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -422,7 +422,7 @@ function addOvniLights1(obj,r,d,radius,angle){
     obj.add(mesh);
 }
 
-function addOvniLights2(obj,r,d,radius,angle){ 
+function addOvniLights2(obj,r,d,radius,angle) { 
     'use strict';
     geometry = new THREE.SphereGeometry(r,d,d);
     // material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -437,9 +437,7 @@ function addOvniLights2(obj,r,d,radius,angle){
     obj.add(mesh);
 }
 
-
-
-function addOvniBeam(obj,r,d,h,t,y){
+function addOvniBeam(obj,r,d,h,t,y) {
     'use strict';
     geometry= new THREE.CylinderGeometry(r,d,h,t);
     // material = new THREE.MeshBasicMaterial({ color: 0xADD8E6});
@@ -454,7 +452,7 @@ function addOvniBeam(obj,r,d,h,t,y){
     obj.add(mesh);
 }
 
-function createOvni(){
+function createOvni() {
     'use strict';
     addOvniBody(ovni,125,32,32); 
     addOvniCockPit(ovni,100,32,32,0,Math.PI);
@@ -558,7 +556,7 @@ function addSphere(obj, r, Vx, Vy, Vz, Sx, Sy, Sz, color) {
 ////////////
 /* UPDATE */
 ////////////
-function update(){
+function update() {
     'use strict';
     if (ovniBeamState)
         spotlight.intensity = 1;
@@ -627,15 +625,23 @@ function animate() {
     delta = clock.getDelta()
     var newOvniVector = new THREE.Vector3();
     for (let [key, value] of ovniflags) {
-        if(value) {
+        if (value) {
             switch (key) {
                 case "LEFT":
-                    newOvniVector.x -= speed * 15 * delta;
-                    spotlight.target.x += speed * 15 * delta;
+                    newOvniVector.x -= speed * 20 * delta;
+                    spotlight.target.x += speed * 20 * delta;
                     break;
                 case "RIGHT":
-                    newOvniVector.x += speed * 15 * delta;
-                    spotlight.target.x += speed * 15 * delta;
+                    newOvniVector.x += speed * 20 * delta;
+                    spotlight.target.x += speed * 20 * delta;
+                    break;
+                case "UP":
+                    newOvniVector.z -= speed * 20 * delta;
+                    spotlight.target.z += speed * 20 * delta;
+                    break;
+                case "DOWN":    
+                    newOvniVector.z += speed * 20 * delta;
+                    spotlight.target.z += speed * 20 * delta;
                     break;
             }
         }
@@ -681,6 +687,12 @@ function onKeyDown(e) {
         case 39:
             ovniflags.set("RIGHT", true);
             break;
+        case 38:
+            ovniflags.set("UP", true);
+            break;
+        case 40:
+            ovniflags.set("DOWN", true);
+            break;
         case 81:
             materialFlags.set("LAMBERT", true);
             break;
@@ -705,7 +717,7 @@ function onKeyDown(e) {
 ///////////////////////
 /* KEY UP CALLBACK */
 ///////////////////////
-function onKeyUp(e){
+function onKeyUp(e) {
     'use strict';
     switch (e.keyCode) {
         case 37:
@@ -713,6 +725,12 @@ function onKeyUp(e){
             break;
         case 39:
             ovniflags.set("RIGHT", false);
+            break;
+        case 38:
+            ovniflags.set("UP", false);
+            break;
+        case 40:
+            ovniflags.set("DOWN", false);  
             break;
     }
 
